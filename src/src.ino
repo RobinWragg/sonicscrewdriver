@@ -2,6 +2,7 @@
 
 // rwtodo:
 // put a 100k resistor between the amp's GAIN pin and 3.3v, instead of the blue wire, for minimum gain.
+// after upgrading to teensy 4.0, try using the 0.25 speed raw file.
 
 //////////////////////////////////////////////////////////
 // AUDIO OUT
