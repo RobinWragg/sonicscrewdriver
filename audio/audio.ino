@@ -1,14 +1,17 @@
 #include <Audio.h>
 
-// rwtodo:
-// put a 100k resistor between the amp's GAIN pin and 3.3v, instead of the blue wire, for minimum gain.
-// after upgrading to teensy 4.0, try using the 0.25 speed raw file.
-
 //////////////////////////////////////////////////////////
 // AUDIO OUT
 //
-#define AUDIO_OUT_VOLUME (0.001)
-#define AUDIO_OUT_SLIDE_SPEED (0.005);
+
+// interface
+float audio_out_speed_control_norm = 0.5f;
+bool audio_out_is_playing = false;
+
+// implementation
+#define AUDIO_OUT_VOLUME (0.01)
+#define AUDIO_OUT_SLIDE_SPEED (0.005)
+#define AUDIO_OUT_SAMPLES_PER_BLOCK (128)
 AudioPlayQueue audio_out_queue;
 AudioOutputI2S i2s_out;
 AudioConnection connection(audio_out_queue, 0, i2s_out, 0);
@@ -20,7 +23,6 @@ float audio_out_src_speed = 0.5f; // 1.0f == 44.1kHz
 int16_t *audio_out_samples;
 uint32_t audio_out_samples_count = audio_out_data_size / 2;
 float audio_out_samples_index = 0;
-float audio_out_speed_control_norm = 1.0f;
 float audio_out_dest_speed_norm = 0.0f;
 ///////////////////////////////////////////////////////////
 
@@ -33,35 +35,47 @@ void setup() {
 	AudioMemory(3); // audio out requires a minimum of 2. 3 for safety.
 }
 
-float temp_pin_norm = 0.0f;
-
 void update_audio_out() {
 	int16_t *sample_buffer = audio_out_queue.getBuffer();
 	
 	if (sample_buffer) {
-		if (audio_out_dest_speed_norm > audio_out_speed_control_norm) {
+		float speed_target;
+		
+		if (audio_out_is_playing) {
+			speed_target = audio_out_speed_control_norm;
+		} else {
+			speed_target = 0.0f;
+		}
+		
+		if (audio_out_dest_speed_norm > speed_target) {
 			audio_out_dest_speed_norm -= AUDIO_OUT_SLIDE_SPEED;
-		} else if (audio_out_dest_speed_norm < audio_out_speed_control_norm) {
+		} else if (audio_out_dest_speed_norm < speed_target) {
 			audio_out_dest_speed_norm += AUDIO_OUT_SLIDE_SPEED;
 		}
 		
-		for (int i = 0; i < 128; i++) {
-			sample_buffer[i] = audio_out_samples[int(audio_out_samples_index)] * AUDIO_OUT_VOLUME;
-			
-			audio_out_samples_index += audio_out_dest_speed_norm * (2 / audio_out_src_speed);
-			
-			if (audio_out_samples_index >= audio_out_samples_count) {
-				audio_out_samples_index -= audio_out_samples_count;
+		if (audio_out_dest_speed_norm > AUDIO_OUT_SLIDE_SPEED) {
+			// Calculate samples and put them in the buffer.
+			for (int i = 0; i < AUDIO_OUT_SAMPLES_PER_BLOCK; i++) {
+				sample_buffer[i] = audio_out_samples[int(audio_out_samples_index)] * AUDIO_OUT_VOLUME;
+				
+				audio_out_samples_index += audio_out_dest_speed_norm * (2 / audio_out_src_speed);
+				
+				if (audio_out_samples_index >= audio_out_samples_count) {
+					audio_out_samples_index -= audio_out_samples_count;
+				}
 			}
+		} else {
+			// Speed is really close to 0, so output 0.
+			memset(sample_buffer, 0, sizeof(int16_t) * AUDIO_OUT_SAMPLES_PER_BLOCK);
 		}
+		
+		audio_out_queue.playBuffer();
 	}
-	
-	audio_out_queue.playBuffer();
 }
 
 void loop() {
-	temp_pin_norm += (float(analogRead(14) / 1024.0f) - temp_pin_norm) * 0.9;
-	audio_out_speed_control_norm = temp_pin_norm;
+	audio_out_is_playing = true;
+	audio_out_speed_control_norm = 0.5;
 	
 	update_audio_out();
 }
