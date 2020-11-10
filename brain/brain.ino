@@ -13,7 +13,7 @@ motor
 
 // rwtodo:
 // put a 100k resistor between the amp's GAIN pin and 3.3v, instead of the blue wire, for minimum gain, as the amp has high current draw.
-// after upgrading to teensy 4.0, switch audio output to the teensy 3.2, with a new 0.3 speed raw file (that's about the slowest that can fit in RAM).
+// after teensy3.2's final RAM requirements are known, generate a new raw file that is as slow as possible.
 
 //////////////////////////////////////////////////////////
 // TFT
