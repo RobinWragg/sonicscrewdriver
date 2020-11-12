@@ -77,9 +77,10 @@ void tft_demo() {
 }
 
 void loop() {
-	// debug_norm += (float(analogRead(14) / 1024.0f) - debug_norm) * 0.9;
+	debug_norm += (float(analogRead(9) / 1024.0f) - debug_norm) * 0.1;
 	
 	// delay(5);
+	// Serial.println(debug_norm);
 	
 	tft_demo();
 }
