@@ -1,4 +1,9 @@
 
+/* SMD parts
+Diode: 1N5817 0805 SOD323
+Pad: TPTP10R
+*/
+
 /*
 laser
 spectrometer

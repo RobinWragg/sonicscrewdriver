@@ -1,5 +1,7 @@
 #include <Audio.h>
 
+// https://learn.adafruit.com/adafruit-max98357-i2s-class-d-mono-amp
+
 //////////////////////////////////////////////////////////
 // AUDIO OUT
 //
