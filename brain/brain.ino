@@ -18,10 +18,44 @@ motor
 
 // rwtodo:
 // put a 100k resistor between the amp's GAIN pin and 3.3v, instead of the blue wire, for minimum gain, as the amp has high current draw.
-// after teensy3.2's final RAM requirements are known, generate a new raw file that is as slow as possible.
+// after teensy3.2's final RAM requirements are known, generate a new raw file that is as slow as possible. 0.3 speed?
 
 #define UV_PWM_PIN (22)
 #define TORCH_PWM_PIN (23)
+
+//////////////////////////////////////////////////////////
+// feedback
+//
+
+bool feedback_on = false;
+/* rwtodo:
+bool feedback_uv_on =
+bool feedback_torch_on =
+bool feedback_accent_on =
+bool feedback_audio_on =
+*/
+float feedback_intensity = 0.0f;
+
+void feedback_update() {
+	uint8_t serial_byte;
+	
+	if (feedback_on) {
+		serial_byte = feedback_intensity * 255.0f;
+		if (serial_byte == 0) serial_byte = 1;
+		
+		float light_intensity = feedback_intensity * feedback_intensity;
+		
+		analogWrite(UV_PWM_PIN, light_intensity * 16383);
+		analogWrite(TORCH_PWM_PIN, light_intensity * 1023);
+		// digitalWrite(UV_PWM_PIN, HIGH);
+	} else {
+		serial_byte = 0;
+		digitalWriteFast(UV_PWM_PIN, LOW);
+		digitalWriteFast(TORCH_PWM_PIN, LOW);
+	}
+	
+	Serial1.write(&serial_byte, 1);
+}
 
 //////////////////////////////////////////////////////////
 // TFT
@@ -38,15 +72,17 @@ Adafruit_ST7789 tft = Adafruit_ST7789(TFT_CS, TFT_DC, TFT_RST);
 
 void setup() {
 	Serial.begin(9600);
-	analogWriteResolution(10); // 12bit means max value is 4095
+	
+	// Setup communication with audio-out core
+	Serial1.begin(9600); // rwtodo: maybe bump this up slightly on both chips. Test the maximum.
+	
+	analogWriteResolution(14); // rwtodo: refactor this dependency sensibly.
 	
 	tft.init(135, 240);
 	tft.fillScreen(ST77XX_BLACK);
 	tft.setFont(&FreeMonoBold12pt7b);
 	tft.setTextColor(ST77XX_WHITE);
 }
-
-float debug_norm = 0.0f;
 
 void tft_demo() {
 	tft.fillScreen(ST77XX_BLACK);
@@ -84,34 +120,17 @@ void tft_demo() {
 	delay(500);
 }
 
-float move = 0;
+float debug_angle = 0;
 
 void loop() {
-	debug_norm += (float(analogRead(19) / 1024.0f) - debug_norm) * 0.1;
+	debug_angle += 0.01;
 	
-	// delay(5);
-	Serial.println(debug_norm);
+	feedback_on = true;
+	feedback_intensity = sinf(debug_angle) * 0.5f + 0.5f;
 	
-	// tft_demo();
-	// analogWrite(22, 0);
-	// delay(200);
-	// analogWrite(22, 1);
-	// delay(200);
-	// analogWrite(22, 2);
-	// delay(200);
-	// analogWrite(22, 3);
-	// delay(200);
-	// analogWrite(22, 4);
-	// delay(200);
-	// analogWrite(22, 5);
-	// delay(200);
-	// analogWrite(22, 6);
-	// delay(200);
-	move += 0.01;
-	if (move > 1) move = 0;
-	analogWrite(22, move * 1023);
-	analogWrite(23, 1023 - move * 1023);
-	delay(20);
+	feedback_update();
+	
+	delay(10);
 }
 
 
