@@ -5935,10 +5935,14 @@ Source: http://www.mew-europe.com/..  en_ds_61613_0000.pdf</description>
 <part name="GND1" library="testpad" library_urn="urn:adsk.eagle:library:385" deviceset="TP" device="TP10R" package3d_urn="urn:adsk.eagle:package:27959/1"/>
 <part name="U$1" library="general" deviceset="TEENSY40EDGES" device=""/>
 <part name="K1" library="relay" library_urn="urn:adsk.eagle:library:339" deviceset="AQH*223" device="A" package3d_urn="urn:adsk.eagle:package:24377/1" technology="2"/>
-<part name="TODO" library="transistor" library_urn="urn:adsk.eagle:library:402" deviceset="BC846" device="" package3d_urn="urn:adsk.eagle:package:28738/2"/>
-<part name="R5" library="resistor" library_urn="urn:adsk.eagle:library:348" deviceset="R-EU_" device="M0805" package3d_urn="urn:adsk.eagle:package:23556/2" value="10k"/>
+<part name="N1" library="transistor" library_urn="urn:adsk.eagle:library:402" deviceset="BC846" device="" package3d_urn="urn:adsk.eagle:package:28738/2"/>
 <part name="SW0" library="testpad" library_urn="urn:adsk.eagle:library:385" deviceset="TP" device="TP10R" package3d_urn="urn:adsk.eagle:package:27959/1"/>
 <part name="SW1" library="testpad" library_urn="urn:adsk.eagle:library:385" deviceset="TP" device="TP10R" package3d_urn="urn:adsk.eagle:package:27959/1"/>
+<part name="R6" library="resistor" library_urn="urn:adsk.eagle:library:348" deviceset="R-EU_" device="M0805" package3d_urn="urn:adsk.eagle:package:23556/2" value="1k"/>
+<part name="R7" library="resistor" library_urn="urn:adsk.eagle:library:348" deviceset="R-EU_" device="M0805" package3d_urn="urn:adsk.eagle:package:23556/2" value="1k"/>
+<part name="N2" library="transistor" library_urn="urn:adsk.eagle:library:402" deviceset="BC846" device="" package3d_urn="urn:adsk.eagle:package:28738/2"/>
+<part name="UVRET" library="testpad" library_urn="urn:adsk.eagle:library:385" deviceset="TP" device="TP10R" package3d_urn="urn:adsk.eagle:package:27959/1"/>
+<part name="TORET" library="testpad" library_urn="urn:adsk.eagle:library:385" deviceset="TP" device="TP10R" package3d_urn="urn:adsk.eagle:package:27959/1"/>
 </parts>
 <sheets>
 <sheet>
@@ -5969,21 +5973,21 @@ Source: http://www.mew-europe.com/..  en_ds_61613_0000.pdf</description>
 <attribute name="NAME" x="-77.47" y="87.63" size="1.778" layer="95" rot="R90"/>
 <attribute name="TP_SIGNAL_NAME" x="-74.93" y="85.09" size="1.778" layer="97"/>
 </instance>
-<instance part="R1" gate="G$1" x="-109.22" y="68.58" smashed="yes">
-<attribute name="NAME" x="-113.03" y="70.0786" size="1.778" layer="95"/>
-<attribute name="VALUE" x="-107.95" y="70.358" size="1.778" layer="96"/>
+<instance part="R1" gate="G$1" x="-109.22" y="22.86" smashed="yes">
+<attribute name="NAME" x="-113.03" y="24.3586" size="1.778" layer="95"/>
+<attribute name="VALUE" x="-107.95" y="24.638" size="1.778" layer="96"/>
 </instance>
-<instance part="R2" gate="G$1" x="-109.22" y="60.96" smashed="yes">
-<attribute name="NAME" x="-113.03" y="62.4586" size="1.778" layer="95"/>
-<attribute name="VALUE" x="-107.95" y="62.738" size="1.778" layer="96"/>
+<instance part="R2" gate="G$1" x="-109.22" y="15.24" smashed="yes">
+<attribute name="NAME" x="-113.03" y="16.7386" size="1.778" layer="95"/>
+<attribute name="VALUE" x="-107.95" y="17.018" size="1.778" layer="96"/>
 </instance>
-<instance part="R3" gate="G$1" x="-109.22" y="55.88" smashed="yes">
-<attribute name="NAME" x="-113.03" y="57.3786" size="1.778" layer="95"/>
-<attribute name="VALUE" x="-107.95" y="57.658" size="1.778" layer="96"/>
+<instance part="R3" gate="G$1" x="-109.22" y="10.16" smashed="yes">
+<attribute name="NAME" x="-113.03" y="11.6586" size="1.778" layer="95"/>
+<attribute name="VALUE" x="-107.95" y="11.938" size="1.778" layer="96"/>
 </instance>
-<instance part="R4" gate="G$1" x="-109.22" y="48.26" smashed="yes">
-<attribute name="NAME" x="-113.03" y="49.7586" size="1.778" layer="95"/>
-<attribute name="VALUE" x="-107.95" y="50.038" size="1.778" layer="96"/>
+<instance part="R4" gate="G$1" x="-109.22" y="2.54" smashed="yes">
+<attribute name="NAME" x="-113.03" y="4.0386" size="1.778" layer="95"/>
+<attribute name="VALUE" x="-107.95" y="4.318" size="1.778" layer="96"/>
 </instance>
 <instance part="CHARGE" gate="G$1" x="-27.94" y="106.68" smashed="yes">
 <attribute name="NAME" x="-29.21" y="107.95" size="1.778" layer="95"/>
@@ -6002,21 +6006,37 @@ Source: http://www.mew-europe.com/..  en_ds_61613_0000.pdf</description>
 <attribute name="NAME" x="-35.56" y="138.43" size="1.778" layer="95" font="vector"/>
 <attribute name="VALUE" x="-35.56" y="116.84" size="1.778" layer="96" font="vector"/>
 </instance>
-<instance part="TODO" gate="G$1" x="-71.12" y="106.68" smashed="yes">
-<attribute name="NAME" x="-81.28" y="114.3" size="1.778" layer="95"/>
-<attribute name="VALUE" x="-81.28" y="111.76" size="1.778" layer="96"/>
+<instance part="N1" gate="G$1" x="-81.28" y="2.54" smashed="yes" rot="MR0">
+<attribute name="NAME" x="-83.82" y="2.54" size="1.778" layer="95" rot="MR0"/>
+<attribute name="VALUE" x="-83.82" y="0" size="1.778" layer="96" rot="MR0"/>
 </instance>
-<instance part="R5" gate="G$1" x="0" y="63.5" smashed="yes">
-<attribute name="NAME" x="-3.81" y="64.9986" size="1.778" layer="95"/>
-<attribute name="VALUE" x="1.27" y="65.278" size="1.778" layer="96"/>
+<instance part="SW0" gate="G$1" x="0" y="134.62" smashed="yes" rot="R270">
+<attribute name="NAME" x="1.27" y="135.89" size="1.778" layer="95"/>
+<attribute name="TP_SIGNAL_NAME" x="-1.27" y="133.35" size="1.778" layer="97" rot="R270"/>
 </instance>
-<instance part="SW0" gate="G$1" x="-7.62" y="134.62" smashed="yes" rot="R270">
-<attribute name="NAME" x="-6.35" y="135.89" size="1.778" layer="95"/>
-<attribute name="TP_SIGNAL_NAME" x="-8.89" y="133.35" size="1.778" layer="97" rot="R270"/>
+<instance part="SW1" gate="G$1" x="0" y="127" smashed="yes" rot="R270">
+<attribute name="NAME" x="1.27" y="128.27" size="1.778" layer="95"/>
+<attribute name="TP_SIGNAL_NAME" x="-1.27" y="125.73" size="1.778" layer="97" rot="R270"/>
 </instance>
-<instance part="SW1" gate="G$1" x="-7.62" y="127" smashed="yes" rot="R270">
-<attribute name="NAME" x="-6.35" y="128.27" size="1.778" layer="95"/>
-<attribute name="TP_SIGNAL_NAME" x="-8.89" y="125.73" size="1.778" layer="97" rot="R270"/>
+<instance part="R6" gate="G$1" x="-73.66" y="-2.54" smashed="yes">
+<attribute name="NAME" x="-77.47" y="-1.0414" size="1.778" layer="95"/>
+<attribute name="VALUE" x="-72.39" y="-0.762" size="1.778" layer="96"/>
+</instance>
+<instance part="R7" gate="G$1" x="-73.66" y="-7.62" smashed="yes">
+<attribute name="NAME" x="-77.47" y="-6.1214" size="1.778" layer="95"/>
+<attribute name="VALUE" x="-72.39" y="-5.842" size="1.778" layer="96"/>
+</instance>
+<instance part="N2" gate="G$1" x="-81.28" y="-12.7" smashed="yes" rot="MR0">
+<attribute name="NAME" x="-83.82" y="-12.7" size="1.778" layer="95" rot="MR0"/>
+<attribute name="VALUE" x="-83.82" y="-15.24" size="1.778" layer="96" rot="MR0"/>
+</instance>
+<instance part="UVRET" gate="G$1" x="-101.6" y="-2.54" smashed="yes" rot="R90">
+<attribute name="NAME" x="-102.87" y="-3.81" size="1.778" layer="95" rot="R180"/>
+<attribute name="TP_SIGNAL_NAME" x="-100.33" y="-1.27" size="1.778" layer="97" rot="R90"/>
+</instance>
+<instance part="TORET" gate="G$1" x="-101.6" y="-17.78" smashed="yes" rot="R90">
+<attribute name="NAME" x="-102.87" y="-19.05" size="1.778" layer="95" rot="R180"/>
+<attribute name="TP_SIGNAL_NAME" x="-100.33" y="-16.51" size="1.778" layer="97" rot="R90"/>
 </instance>
 </instances>
 <busses>
@@ -6025,28 +6045,26 @@ Source: http://www.mew-europe.com/..  en_ds_61613_0000.pdf</description>
 <net name="4V" class="1">
 <segment>
 <pinref part="R3" gate="G$1" pin="1"/>
-<wire x1="-114.3" y1="55.88" x2="-121.92" y2="55.88" width="0.1524" layer="91"/>
-<label x="-121.92" y="55.88" size="1.778" layer="95"/>
+<wire x1="-114.3" y1="10.16" x2="-121.92" y2="10.16" width="0.1524" layer="91"/>
+<label x="-121.92" y="10.16" size="1.778" layer="95"/>
 </segment>
 <segment>
 <pinref part="U$1" gate="G$1" pin="VIN"/>
 <wire x1="-33.02" y1="81.28" x2="-27.94" y2="81.28" width="0.1524" layer="91"/>
 <pinref part="D1" gate="D$1" pin="C"/>
 <wire x1="-27.94" y1="93.98" x2="-27.94" y2="81.28" width="0.1524" layer="91"/>
-<pinref part="K1" gate="G$1" pin="DS3"/>
-<wire x1="-12.7" y1="127" x2="-10.16" y2="127" width="0.1524" layer="91"/>
 <wire x1="-27.94" y1="81.28" x2="-10.16" y2="81.28" width="0.1524" layer="91"/>
 <wire x1="-10.16" y1="81.28" x2="-10.16" y2="104.14" width="0.1524" layer="91"/>
 <junction x="-27.94" y="81.28"/>
 <pinref part="4V" gate="G$1" pin="TP"/>
-<wire x1="-10.16" y1="104.14" x2="-10.16" y2="127" width="0.1524" layer="91"/>
 <wire x1="-2.54" y1="104.14" x2="5.08" y2="104.14" width="0.1524" layer="91"/>
 <label x="2.54" y="104.14" size="1.778" layer="95"/>
 <wire x1="-2.54" y1="104.14" x2="-10.16" y2="104.14" width="0.1524" layer="91"/>
 <junction x="-2.54" y="104.14"/>
+<pinref part="K1" gate="G$1" pin="DS3"/>
+<wire x1="-12.7" y1="127" x2="-10.16" y2="127" width="0.1524" layer="91"/>
+<wire x1="-10.16" y1="127" x2="-10.16" y2="104.14" width="0.1524" layer="91"/>
 <junction x="-10.16" y="104.14"/>
-<pinref part="SW1" gate="G$1" pin="TP"/>
-<junction x="-10.16" y="127"/>
 </segment>
 </net>
 <net name="GND" class="1">
@@ -6064,36 +6082,37 @@ Source: http://www.mew-europe.com/..  en_ds_61613_0000.pdf</description>
 </segment>
 <segment>
 <pinref part="R2" gate="G$1" pin="1"/>
-<wire x1="-114.3" y1="60.96" x2="-121.92" y2="60.96" width="0.1524" layer="91"/>
-<label x="-121.92" y="60.96" size="1.778" layer="95"/>
+<wire x1="-114.3" y1="15.24" x2="-121.92" y2="15.24" width="0.1524" layer="91"/>
+<label x="-121.92" y="15.24" size="1.778" layer="95"/>
 </segment>
 <segment>
 <pinref part="R4" gate="G$1" pin="1"/>
-<wire x1="-114.3" y1="48.26" x2="-121.92" y2="48.26" width="0.1524" layer="91"/>
-<label x="-121.92" y="48.26" size="1.778" layer="95"/>
+<wire x1="-114.3" y1="2.54" x2="-121.92" y2="2.54" width="0.1524" layer="91"/>
+<label x="-121.92" y="2.54" size="1.778" layer="95"/>
 </segment>
 </net>
 <net name="N$6" class="0">
 <segment>
 <pinref part="R1" gate="G$1" pin="2"/>
 <pinref part="R2" gate="G$1" pin="2"/>
-<wire x1="-104.14" y1="68.58" x2="-104.14" y2="60.96" width="0.1524" layer="91"/>
-<pinref part="U$1" gate="G$1" pin="14-A0/TX3/S-PDIF_IN"/>
-<wire x1="-63.5" y1="58.42" x2="-101.6" y2="58.42" width="0.1524" layer="91"/>
-<wire x1="-101.6" y1="58.42" x2="-101.6" y2="60.96" width="0.1524" layer="91"/>
-<wire x1="-101.6" y1="60.96" x2="-104.14" y2="60.96" width="0.1524" layer="91"/>
-<junction x="-104.14" y="60.96"/>
+<wire x1="-104.14" y1="22.86" x2="-104.14" y2="15.24" width="0.1524" layer="91"/>
+<wire x1="-104.14" y1="22.86" x2="-71.12" y2="22.86" width="0.1524" layer="91"/>
+<junction x="-104.14" y="22.86"/>
+<wire x1="-71.12" y1="22.86" x2="-71.12" y2="27.94" width="0.1524" layer="91"/>
+<pinref part="U$1" gate="G$1" pin="20-A6/TX5/LRCLK1"/>
+<wire x1="-71.12" y1="27.94" x2="-63.5" y2="27.94" width="0.1524" layer="91"/>
 </segment>
 </net>
 <net name="N$2" class="0">
 <segment>
 <pinref part="R3" gate="G$1" pin="2"/>
 <pinref part="R4" gate="G$1" pin="2"/>
-<wire x1="-104.14" y1="55.88" x2="-104.14" y2="53.34" width="0.1524" layer="91"/>
-<junction x="-104.14" y="53.34"/>
-<wire x1="-104.14" y1="53.34" x2="-104.14" y2="48.26" width="0.1524" layer="91"/>
-<wire x1="-104.14" y1="53.34" x2="-63.5" y2="53.34" width="0.1524" layer="91"/>
-<pinref part="U$1" gate="G$1" pin="15-A1/RX3/SPDIF_IN"/>
+<wire x1="-104.14" y1="10.16" x2="-104.14" y2="2.54" width="0.1524" layer="91"/>
+<wire x1="-104.14" y1="10.16" x2="-68.58" y2="10.16" width="0.1524" layer="91"/>
+<junction x="-104.14" y="10.16"/>
+<wire x1="-68.58" y1="10.16" x2="-68.58" y2="22.86" width="0.1524" layer="91"/>
+<pinref part="U$1" gate="G$1" pin="21-A7/RX5/BCLK1"/>
+<wire x1="-68.58" y1="22.86" x2="-63.5" y2="22.86" width="0.1524" layer="91"/>
 </segment>
 </net>
 <net name="VUSB" class="1">
@@ -6110,8 +6129,8 @@ Source: http://www.mew-europe.com/..  en_ds_61613_0000.pdf</description>
 </segment>
 <segment>
 <pinref part="R1" gate="G$1" pin="1"/>
-<wire x1="-114.3" y1="68.58" x2="-121.92" y2="68.58" width="0.1524" layer="91"/>
-<label x="-121.92" y="68.58" size="1.778" layer="95"/>
+<wire x1="-114.3" y1="22.86" x2="-121.92" y2="22.86" width="0.1524" layer="91"/>
+<label x="-121.92" y="22.86" size="1.778" layer="95"/>
 </segment>
 </net>
 <net name="N$4" class="1">
@@ -6130,29 +6149,22 @@ Source: http://www.mew-europe.com/..  en_ds_61613_0000.pdf</description>
 <junction x="-43.18" y="81.28"/>
 <label x="-50.8" y="81.28" size="1.778" layer="95"/>
 </segment>
+<segment>
+<pinref part="N1" gate="G$1" pin="C"/>
+<wire x1="-83.82" y1="7.62" x2="-99.06" y2="7.62" width="0.1524" layer="91"/>
+<label x="-99.06" y="7.62" size="1.778" layer="95"/>
+</segment>
+<segment>
+<pinref part="N2" gate="G$1" pin="C"/>
+<wire x1="-83.82" y1="-7.62" x2="-99.06" y2="-7.62" width="0.1524" layer="91"/>
+<label x="-99.06" y="-7.62" size="1.778" layer="95"/>
+</segment>
 </net>
 <net name="N$5" class="1">
 <segment>
 <pinref part="D2" gate="D$1" pin="C"/>
 <pinref part="K1" gate="G$1" pin="DS1"/>
 <wire x1="-12.7" y1="139.7" x2="-12.7" y2="134.62" width="0.1524" layer="91"/>
-<pinref part="SW0" gate="G$1" pin="TP"/>
-<wire x1="-12.7" y1="134.62" x2="-10.16" y2="134.62" width="0.1524" layer="91"/>
-<junction x="-12.7" y="134.62"/>
-</segment>
-</net>
-<net name="N$3" class="0">
-<segment>
-<pinref part="U$1" gate="G$1" pin="2-OUT2"/>
-<pinref part="R5" gate="G$1" pin="1"/>
-<wire x1="-7.62" y1="63.5" x2="-5.08" y2="63.5" width="0.1524" layer="91"/>
-</segment>
-</net>
-<net name="BATSIG" class="0">
-<segment>
-<pinref part="R5" gate="G$1" pin="2"/>
-<wire x1="5.08" y1="63.5" x2="15.24" y2="63.5" width="0.1524" layer="91"/>
-<label x="12.7" y="63.5" size="1.778" layer="95"/>
 </segment>
 </net>
 <net name="N$1" class="0">
@@ -6165,6 +6177,51 @@ Source: http://www.mew-europe.com/..  en_ds_61613_0000.pdf</description>
 <segment>
 <pinref part="K1" gate="G$1" pin="K1"/>
 <wire x1="-38.1" y1="124.46" x2="-40.64" y2="124.46" width="0.1524" layer="91"/>
+</segment>
+</net>
+<net name="N$10" class="0">
+<segment>
+<pinref part="R6" gate="G$1" pin="1"/>
+<pinref part="N1" gate="G$1" pin="B"/>
+<wire x1="-78.74" y1="-2.54" x2="-78.74" y2="2.54" width="0.1524" layer="91"/>
+</segment>
+</net>
+<net name="N$11" class="0">
+<segment>
+<pinref part="R7" gate="G$1" pin="1"/>
+<pinref part="N2" gate="G$1" pin="B"/>
+<wire x1="-78.74" y1="-7.62" x2="-78.74" y2="-12.7" width="0.1524" layer="91"/>
+</segment>
+</net>
+<net name="N$12" class="0">
+<segment>
+<pinref part="N1" gate="G$1" pin="E"/>
+<wire x1="-83.82" y1="-2.54" x2="-99.06" y2="-2.54" width="0.1524" layer="91"/>
+<pinref part="UVRET" gate="G$1" pin="TP"/>
+</segment>
+</net>
+<net name="N$13" class="0">
+<segment>
+<pinref part="N2" gate="G$1" pin="E"/>
+<wire x1="-83.82" y1="-17.78" x2="-99.06" y2="-17.78" width="0.1524" layer="91"/>
+<pinref part="TORET" gate="G$1" pin="TP"/>
+</segment>
+</net>
+<net name="N$8" class="0">
+<segment>
+<pinref part="U$1" gate="G$1" pin="23-A9/CRX1/MCLK1"/>
+<pinref part="R7" gate="G$1" pin="2"/>
+<wire x1="-63.5" y1="12.7" x2="-63.5" y2="-7.62" width="0.1524" layer="91"/>
+<wire x1="-63.5" y1="-7.62" x2="-68.58" y2="-7.62" width="0.1524" layer="91"/>
+</segment>
+</net>
+<net name="N$9" class="0">
+<segment>
+<pinref part="U$1" gate="G$1" pin="22-A8/CTX1"/>
+<wire x1="-63.5" y1="17.78" x2="-66.04" y2="17.78" width="0.1524" layer="91"/>
+<wire x1="-66.04" y1="17.78" x2="-66.04" y2="-2.54" width="0.1524" layer="91"/>
+<pinref part="R6" gate="G$1" pin="2"/>
+<wire x1="-66.04" y1="-2.54" x2="-68.58" y2="-2.54" width="0.1524" layer="91"/>
 </segment>
 </net>
 </nets>

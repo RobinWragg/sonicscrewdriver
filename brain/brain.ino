@@ -20,6 +20,9 @@ motor
 // put a 100k resistor between the amp's GAIN pin and 3.3v, instead of the blue wire, for minimum gain, as the amp has high current draw.
 // after teensy3.2's final RAM requirements are known, generate a new raw file that is as slow as possible.
 
+#define UV_PWM_PIN (22)
+#define TORCH_PWM_PIN (23)
+
 //////////////////////////////////////////////////////////
 // TFT
 // https://learn.adafruit.com/adafruit-1-14-240x135-color-tft-breakout
@@ -28,14 +31,14 @@ motor
 #include <Adafruit_ST7789.h>
 #include <SPI.h>
 #include <Fonts/FreeMonoBold12pt7b.h>
+#define TFT_RST (8)
+#define TFT_DC (9)
 #define TFT_CS (10)
-#define TFT_RST (7)
-#define TFT_DC (8)
 Adafruit_ST7789 tft = Adafruit_ST7789(TFT_CS, TFT_DC, TFT_RST);
 
 void setup() {
 	Serial.begin(9600);
-	// analogWriteResolution(12); // 12bit means max value is 4095
+	analogWriteResolution(10); // 12bit means max value is 4095
 	
 	tft.init(135, 240);
 	tft.fillScreen(ST77XX_BLACK);
@@ -81,13 +84,34 @@ void tft_demo() {
 	delay(500);
 }
 
+float move = 0;
+
 void loop() {
-	debug_norm += (float(analogRead(9) / 1024.0f) - debug_norm) * 0.1;
+	debug_norm += (float(analogRead(19) / 1024.0f) - debug_norm) * 0.1;
 	
 	// delay(5);
-	// Serial.println(debug_norm);
+	Serial.println(debug_norm);
 	
-	tft_demo();
+	// tft_demo();
+	// analogWrite(22, 0);
+	// delay(200);
+	// analogWrite(22, 1);
+	// delay(200);
+	// analogWrite(22, 2);
+	// delay(200);
+	// analogWrite(22, 3);
+	// delay(200);
+	// analogWrite(22, 4);
+	// delay(200);
+	// analogWrite(22, 5);
+	// delay(200);
+	// analogWrite(22, 6);
+	// delay(200);
+	move += 0.01;
+	if (move > 1) move = 0;
+	analogWrite(22, move * 1023);
+	analogWrite(23, 1023 - move * 1023);
+	delay(20);
 }
 
 
