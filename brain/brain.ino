@@ -46,12 +46,10 @@ void feedback_update() {
 		
 		float light_intensity = feedback_intensity * feedback_intensity;
 		
-		analogWrite(LASER_PWM_PIN, light_intensity * 16383); // temp
 		analogWrite(UV_PWM_PIN, light_intensity * 16383);
 		analogWrite(TORCH_PWM_PIN, light_intensity * 1023);
 	} else {
 		serial_byte = 0;
-		analogWrite(LASER_PWM_PIN, 0); // temp
 		analogWrite(UV_PWM_PIN, 0);
 		analogWrite(TORCH_PWM_PIN, 0);
 	}
@@ -73,14 +71,17 @@ void feedback_update() {
 Adafruit_ST7789 tft = Adafruit_ST7789(TFT_CS, TFT_DC, TFT_RST);
 
 void setup() {
+	analogWriteResolution(14); // rwtodo: refactor this dependency sensibly.
+	pinMode(LASER_PWM_PIN, OUTPUT);
+	pinMode(UV_PWM_PIN, OUTPUT);
+	pinMode(TORCH_PWM_PIN, OUTPUT);
+	
 	Serial.begin(9600);
 	
 	// Setup communication with audio-out core
 	Serial1.begin(9600); // rwtodo: maybe bump this up slightly on both chips. Test the maximum.
 	
-	analogWriteResolution(14); // rwtodo: refactor this dependency sensibly.
-	
-	tft.init(135, 240);
+	tft.init(135, 240); // rwtodo: this takes a long time, 500ms or so.
 	tft.fillScreen(ST77XX_BLACK);
 	tft.setFont(&FreeMonoBold12pt7b);
 	tft.setTextColor(ST77XX_WHITE);
@@ -125,14 +126,21 @@ void tft_demo() {
 float debug_angle = 0;
 
 void loop() {
-	debug_angle += 0.01;
+	// probe demo
 	
-	feedback_on = true;
-	feedback_intensity = sinf(debug_angle) * 0.5f + 0.5f;
+	float a = sinf(debug_angle) * 0.5f + 0.5f;
+	analogWrite(LASER_PWM_PIN, a*a * 16383);
 	
-	feedback_update();
+	float b = sinf(debug_angle+2) * 0.5f + 0.5f;
+	analogWrite(TORCH_PWM_PIN, b*b * 16383);
 	
-	delay(10);
+	float c = sinf(debug_angle+4) * 0.5f + 0.5f;
+	analogWrite(UV_PWM_PIN, c*c * 16383);
+	
+	debug_angle += 0.05;
+	if (debug_angle > 2*M_PI) debug_angle -= 2*M_PI;
+	
+	delay(20);
 }
 
 
