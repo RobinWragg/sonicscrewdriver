@@ -22,7 +22,8 @@ motor
 
 #define LASER_PWM_PIN (19)
 #define UV_PWM_PIN (22)
-#define TORCH_PWM_PIN (23)
+#define TORCH_PWM_PIN (18)
+#define UNAVAILABLE_PIN (23)
 
 //////////////////////////////////////////////////////////
 // feedback
@@ -58,6 +59,18 @@ void feedback_update() {
 }
 
 //////////////////////////////////////////////////////////
+// audio in
+// https://learn.adafruit.com/adafruit-i2s-mems-microphone-breakout/
+
+#include <Audio.h>
+
+AudioInputI2S i2s;
+AudioAnalyzeFFT256 fft;
+AudioAnalyzeNoteFrequency note_freq;
+AudioConnection patchCord1(i2s, 0, fft, 0);
+AudioConnection patchCord2(i2s, 0, note_freq, 0);
+
+//////////////////////////////////////////////////////////
 // TFT
 // https://learn.adafruit.com/adafruit-1-14-240x135-color-tft-breakout
 
@@ -65,7 +78,7 @@ void feedback_update() {
 #include <Adafruit_ST7789.h>
 #include <SPI.h>
 #include <Fonts/FreeMonoBold12pt7b.h>
-#define TFT_RST (8)
+#define TFT_RST (7)
 #define TFT_DC (9)
 #define TFT_CS (10)
 Adafruit_ST7789 tft = Adafruit_ST7789(TFT_CS, TFT_DC, TFT_RST);
@@ -85,6 +98,14 @@ void setup() {
 	tft.fillScreen(ST77XX_BLACK);
 	tft.setFont(&FreeMonoBold12pt7b);
 	tft.setTextColor(ST77XX_WHITE);
+	
+	
+	
+	
+	
+	// rwtodo: this is temp audio stuff.
+	AudioMemory(30); // notefreq requires less than 30. rwtodo: increase this if FFT doesn't work.
+	note_freq.begin(0.3f); // certainty. 
 }
 
 void tft_demo() {
@@ -124,6 +145,7 @@ void tft_demo() {
 }
 
 float debug_angle = 0;
+bool debug_flip = false;
 
 void loop() {
 	// probe demo
@@ -137,10 +159,21 @@ void loop() {
 	float c = sinf(debug_angle+4) * 0.5f + 0.5f;
 	analogWrite(UV_PWM_PIN, c*c * 16383);
 	
-	debug_angle += 0.05;
+	debug_angle += 0.5;
 	if (debug_angle > 2*M_PI) debug_angle -= 2*M_PI;
 	
-	delay(20);
+	tft.fillScreen(ST77XX_BLACK);
+	if (debug_flip) tft.fillCircle(50, 50, 40, ST77XX_GREEN);
+	debug_flip = !debug_flip;
+	
+	if (note_freq.available()) {
+		float f = note_freq.read();
+		Serial.print("freq: "); Serial.println(f);
+		tft.setCursor(30, 120);
+		tft.print(f);
+	}
+	
+	delay(100);
 }
 
 
