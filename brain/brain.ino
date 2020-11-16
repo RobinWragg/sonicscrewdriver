@@ -20,6 +20,7 @@ motor
 // put a 100k resistor between the amp's GAIN pin and 3.3v, instead of the blue wire, for minimum gain, as the amp has high current draw.
 // after teensy3.2's final RAM requirements are known, generate a new raw file that is as slow as possible. 0.3 speed?
 
+#define LASER_PWM_PIN (19)
 #define UV_PWM_PIN (22)
 #define TORCH_PWM_PIN (23)
 
@@ -45,13 +46,14 @@ void feedback_update() {
 		
 		float light_intensity = feedback_intensity * feedback_intensity;
 		
+		analogWrite(LASER_PWM_PIN, light_intensity * 16383); // temp
 		analogWrite(UV_PWM_PIN, light_intensity * 16383);
 		analogWrite(TORCH_PWM_PIN, light_intensity * 1023);
-		// digitalWrite(UV_PWM_PIN, HIGH);
 	} else {
 		serial_byte = 0;
-		digitalWriteFast(UV_PWM_PIN, LOW);
-		digitalWriteFast(TORCH_PWM_PIN, LOW);
+		analogWrite(LASER_PWM_PIN, 0); // temp
+		analogWrite(UV_PWM_PIN, 0);
+		analogWrite(TORCH_PWM_PIN, 0);
 	}
 	
 	Serial1.write(&serial_byte, 1);
