@@ -2,6 +2,7 @@
 /* SMD parts
 Diode: 1N5817 0805 SOD323
 Pad: TPTP10R
+NPN: BC846(B) SOT-23
 */
 
 /*
