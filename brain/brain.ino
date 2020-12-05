@@ -24,7 +24,6 @@ motor
 //////////////////////////////////////////////////////////
 // pins
 //
-
 #define LASER_PWM_PIN (4)
 #define UV_PWM_PIN (2)
 #define TORCH_PWM_PIN (3)
@@ -33,6 +32,8 @@ motor
 //////////////////////////////////////////////////////////
 // general
 //
+#define PWM_BIT_DEPTH (14)
+int PWM_MAX; // Defined in setup()
 
 float lerp(float a, float b, float t) {
 	return a + (b-a)*t;
@@ -52,7 +53,7 @@ bool feedback_audio_on =
 float feedback_intensity = 0.0f;
 float feedback_volume = 0.0f;
 
-void feedback_update() {
+void feedback_update(int32_t tt, int32_t dt) {
 	const int serial_buffer_size = 4;
 	uint8_t serial_buffer[serial_buffer_size] = {'p', 0, 'v', 0};
 	uint8_t &serial_pitch_byte = serial_buffer[1];
@@ -60,24 +61,19 @@ void feedback_update() {
 	
 	if (feedback_on) {
 		serial_pitch_byte = feedback_intensity * 255.0f;
-		if (serial_pitch_byte == 0) serial_pitch_byte = 1;
+		if (serial_pitch_byte == 0) serial_pitch_byte = 1; // A pitch of 0 means no audio.
 		
 		float light_intensity = feedback_intensity * feedback_intensity;
 		
-		analogWrite(UV_PWM_PIN, light_intensity * 16383);
-		analogWrite(TORCH_PWM_PIN, light_intensity * 1023);
+		analogWrite(UV_PWM_PIN, light_intensity * PWM_MAX);
+		analogWrite(TORCH_PWM_PIN, light_intensity * 0.04f * PWM_MAX);
 	} else {
 		serial_pitch_byte = 0;
 		analogWrite(UV_PWM_PIN, 0);
 		analogWrite(TORCH_PWM_PIN, 0);
 	}
 	
-	serial_volume_byte = feedback_volume * 255;
-	
-	Serial.print((char)serial_buffer[0]);
-	Serial.print(serial_buffer[1]);
-	Serial.print((char)serial_buffer[2]);
-	Serial.println(serial_buffer[3]);
+	serial_volume_byte = feedback_volume * 255 * 0.01; // rwtodo: remove the float here for proper volume control.
 	
 	Serial1.write(serial_buffer, serial_buffer_size);
 }
@@ -133,8 +129,6 @@ void tft_test(int32_t tt, int32_t dt) {
 	tft.fillScreen(ST77XX_BLACK);
 	float one_second_loop_norm = (tt % 1000) / 1000.0f;
 	
-	// Serial.println(tt % 1000);
-	
 	int y = lerp(0, 1, one_second_loop_norm) * TFT_HEIGHT;
 	
 	tft.fillCircle(50, y, 40, ST77XX_GREEN);
@@ -165,7 +159,9 @@ void tft_test(int32_t tt, int32_t dt) {
 //
 
 void setup() {
-	analogWriteResolution(14); // rwtodo: refactor this dependency sensibly.
+	analogWriteResolution(PWM_BIT_DEPTH); // rwtodo: refactor this dependency sensibly.
+	PWM_MAX = powf(2, PWM_BIT_DEPTH) - 1;
+	
 	pinMode(LASER_PWM_PIN, OUTPUT);
 	pinMode(UV_PWM_PIN, OUTPUT);
 	pinMode(TORCH_PWM_PIN, OUTPUT);
@@ -191,6 +187,11 @@ void loop() {
 	int32_t loop_total_ms = millis();
 	int32_t delta_ms = loop_total_ms - prev_loop_total_ms;
 	
+	if (delta_ms > 30) {
+		Serial.print("WARNING: dt=");
+		Serial.println(delta_ms);
+	}
+	
 	tft_test(loop_total_ms, delta_ms);
 	
 	
@@ -200,13 +201,13 @@ void loop() {
 	// probe demo
 	
 	// float a = sinf(debug_angle) * 0.5f + 0.5f;
-	// analogWrite(LASER_PWM_PIN, a*a * 16383);
+	// analogWrite(LASER_PWM_PIN, a*a * PWM_MAX);
 	
 	// float b = sinf(debug_angle+2) * 0.5f + 0.5f;
-	// analogWrite(TORCH_PWM_PIN, b*b * 16383);
+	// analogWrite(TORCH_PWM_PIN, b*b * PWM_MAX);
 	
 	// float c = sinf(debug_angle+4) * 0.5f + 0.5f;
-	// analogWrite(UV_PWM_PIN, c*c * 16383);
+	// analogWrite(UV_PWM_PIN, c*c * PWM_MAX);
 	
 	// debug_angle += 0.5;
 	// if (debug_angle > 2*M_PI) debug_angle -= 2*M_PI;
@@ -223,9 +224,9 @@ void loop() {
 	// }
 	
 	feedback_test(loop_total_ms, delta_ms);
-	feedback_update();
+	feedback_update(loop_total_ms, delta_ms);
 	
-	delay(100);
+	delay(20); // It should be possible to reduce this if teensy3 reads serial faster.
 	
 	prev_loop_total_ms = loop_total_ms;
 }
