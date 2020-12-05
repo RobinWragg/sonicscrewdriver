@@ -21,9 +21,9 @@ motor
 // put a 100k resistor between the amp's GAIN pin and 3.3v, instead of the blue wire, for minimum gain, as the amp has high current draw.
 // after teensy3.2's final RAM requirements are known, generate a new raw file that is as slow as possible. 0.3 speed?
 
-#define LASER_PWM_PIN (19)
-#define UV_PWM_PIN (22)
-#define TORCH_PWM_PIN (18)
+#define LASER_PWM_PIN (4)
+#define UV_PWM_PIN (2)
+#define TORCH_PWM_PIN (3)
 #define UNAVAILABLE_PIN (23)
 
 //////////////////////////////////////////////////////////
