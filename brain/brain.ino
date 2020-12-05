@@ -21,10 +21,22 @@ motor
 // put a 100k resistor between the amp's GAIN pin and 3.3v, instead of the blue wire, for minimum gain, as the amp has high current draw.
 // after teensy3.2's final RAM requirements are known, generate a new raw file that is as slow as possible. 0.3 speed?
 
+//////////////////////////////////////////////////////////
+// pins
+//
+
 #define LASER_PWM_PIN (4)
 #define UV_PWM_PIN (2)
 #define TORCH_PWM_PIN (3)
 #define UNAVAILABLE_PIN (23)
+
+//////////////////////////////////////////////////////////
+// general
+//
+
+float lerp(float a, float b, float t) {
+	return a + (b-a)*t;
+}
 
 //////////////////////////////////////////////////////////
 // feedback
@@ -38,25 +50,45 @@ bool feedback_accent_on =
 bool feedback_audio_on =
 */
 float feedback_intensity = 0.0f;
+float feedback_volume = 0.0f;
 
 void feedback_update() {
-	uint8_t serial_byte;
+	const int serial_buffer_size = 4;
+	uint8_t serial_buffer[serial_buffer_size] = {'p', 0, 'v', 0};
+	uint8_t &serial_pitch_byte = serial_buffer[1];
+	uint8_t &serial_volume_byte = serial_buffer[3];
 	
 	if (feedback_on) {
-		serial_byte = feedback_intensity * 255.0f;
-		if (serial_byte == 0) serial_byte = 1;
+		serial_pitch_byte = feedback_intensity * 255.0f;
+		if (serial_pitch_byte == 0) serial_pitch_byte = 1;
 		
 		float light_intensity = feedback_intensity * feedback_intensity;
 		
 		analogWrite(UV_PWM_PIN, light_intensity * 16383);
 		analogWrite(TORCH_PWM_PIN, light_intensity * 1023);
 	} else {
-		serial_byte = 0;
+		serial_pitch_byte = 0;
 		analogWrite(UV_PWM_PIN, 0);
 		analogWrite(TORCH_PWM_PIN, 0);
 	}
 	
-	Serial1.write(&serial_byte, 1);
+	serial_volume_byte = feedback_volume * 255;
+	
+	Serial.print((char)serial_buffer[0]);
+	Serial.print(serial_buffer[1]);
+	Serial.print((char)serial_buffer[2]);
+	Serial.println(serial_buffer[3]);
+	
+	Serial1.write(serial_buffer, serial_buffer_size);
+}
+
+void feedback_test(int32_t tt, int32_t dt) {
+	float one_second_loop_norm = (tt % 1000) / 1000.0f;
+	float three_second_loop_norm = (tt % 3000) / 3000.0f;
+	
+	feedback_on = true;
+	feedback_volume = one_second_loop_norm;
+	feedback_intensity = three_second_loop_norm;
 }
 
 //////////////////////////////////////////////////////////
@@ -82,7 +114,55 @@ AudioConnection patchCord2(i2s, 0, note_freq, 0);
 #define TFT_RST (7)
 #define TFT_DC (9)
 #define TFT_CS (10)
+#define TFT_WIDTH (135)
+#define TFT_HEIGHT (240)
 Adafruit_ST7789 tft = Adafruit_ST7789(TFT_CS, TFT_DC, TFT_RST);
+
+void tft_init() {
+	tft.init(TFT_WIDTH, TFT_HEIGHT); // rwtodo: this takes a long time, 500ms or so.
+	tft.fillScreen(ST77XX_BLACK);
+	tft.setFont(&FreeMonoBold12pt7b);
+	tft.setTextColor(ST77XX_WHITE);
+}
+
+void tft_test(int32_t tt, int32_t dt) {
+	static int timing_result = 0;
+	
+	int start = millis();
+	
+	tft.fillScreen(ST77XX_BLACK);
+	float one_second_loop_norm = (tt % 1000) / 1000.0f;
+	
+	// Serial.println(tt % 1000);
+	
+	int y = lerp(0, 1, one_second_loop_norm) * TFT_HEIGHT;
+	
+	tft.fillCircle(50, y, 40, ST77XX_GREEN);
+	
+	tft.setCursor(30, 70);
+	tft.print(timing_result);
+	tft.print("ms");
+	
+	// reference:
+	// tft.drawPixel(tft.width()/2, tft.height()/2, ST77XX_GREEN);
+	// tft.drawLine(10, 10, 100, 50, ST77XX_YELLOW);
+	// tft.setCursor(30, 70);
+	// tft.print("omg");
+	// tft.drawFastHLine(10, 10, 50, ST77XX_BLUE);
+	// tft.drawFastVLine(10, 10, 50, ST77XX_RED);
+	// tft.drawRect(10, 10, 20, 20, ST77XX_GREEN);
+	// tft.fillRect(20, 30, 40, 50, ST77XX_BLUE);
+	// tft.drawCircle(10, 10, 20, ST77XX_RED);
+	// tft.fillCircle(10, 10, 20, ST77XX_RED);
+	// tft.drawRoundRect(10, 10, 20, 30, 5, ST77XX_YELLOW);
+	
+	int end = millis();
+	timing_result = end - start;
+}
+
+//////////////////////////////////////////////////////////
+// setup + loop
+//
 
 void setup() {
 	analogWriteResolution(14); // rwtodo: refactor this dependency sensibly.
@@ -95,82 +175,59 @@ void setup() {
 	// Setup communication with audio-out core
 	Serial1.begin(9600); // rwtodo: maybe bump this up slightly on both chips. Test the maximum.
 	
-	tft.init(135, 240); // rwtodo: this takes a long time, 500ms or so.
-	tft.fillScreen(ST77XX_BLACK);
-	tft.setFont(&FreeMonoBold12pt7b);
-	tft.setTextColor(ST77XX_WHITE);
+	tft_init();
 	
 	// rwtodo: this is temp audio stuff.
 	AudioMemory(30); // notefreq requires less than 30. rwtodo: increase this if FFT doesn't work.
 	note_freq.begin(0.3f); // certainty. 
 }
 
-void tft_demo() {
-	tft.fillScreen(ST77XX_BLACK);
-	delay(500);
-	
-	tft.drawPixel(tft.width()/2, tft.height()/2, ST77XX_GREEN);
-	delay(500);
-	
-	tft.drawLine(10, 10, 100, 50, ST77XX_YELLOW);
-	delay(500);
-	
-	tft.setCursor(30, 70);
-	tft.print("omg");
-	delay(500);
-	
-	tft.drawFastHLine(10, 10, 50, ST77XX_BLUE);
-	delay(500);
-	
-	tft.drawFastVLine(10, 10, 50, ST77XX_RED);
-	delay(500);
-	
-	tft.drawRect(10, 10, 20, 20, ST77XX_GREEN);
-	delay(500);
-	
-	tft.fillRect(20, 30, 40, 50, ST77XX_BLUE);
-	delay(500);
-	
-	tft.drawCircle(10, 10, 20, ST77XX_RED);
-	delay(500);
-	
-	tft.fillCircle(10, 10, 20, ST77XX_RED);
-	delay(500);
-	
-	tft.drawRoundRect(10, 10, 20, 30, 5, ST77XX_YELLOW);
-	delay(500);
-}
-
 float debug_angle = 0;
 bool debug_flip = false;
 
+int32_t prev_loop_total_ms = 0;
+
 void loop() {
+	int32_t loop_total_ms = millis();
+	int32_t delta_ms = loop_total_ms - prev_loop_total_ms;
+	
+	tft_test(loop_total_ms, delta_ms);
+	
+	
+	
+	
+	
 	// probe demo
 	
-	float a = sinf(debug_angle) * 0.5f + 0.5f;
-	analogWrite(LASER_PWM_PIN, a*a * 16383);
+	// float a = sinf(debug_angle) * 0.5f + 0.5f;
+	// analogWrite(LASER_PWM_PIN, a*a * 16383);
 	
-	float b = sinf(debug_angle+2) * 0.5f + 0.5f;
-	analogWrite(TORCH_PWM_PIN, b*b * 16383);
+	// float b = sinf(debug_angle+2) * 0.5f + 0.5f;
+	// analogWrite(TORCH_PWM_PIN, b*b * 16383);
 	
-	float c = sinf(debug_angle+4) * 0.5f + 0.5f;
-	analogWrite(UV_PWM_PIN, c*c * 16383);
+	// float c = sinf(debug_angle+4) * 0.5f + 0.5f;
+	// analogWrite(UV_PWM_PIN, c*c * 16383);
 	
-	debug_angle += 0.5;
-	if (debug_angle > 2*M_PI) debug_angle -= 2*M_PI;
+	// debug_angle += 0.5;
+	// if (debug_angle > 2*M_PI) debug_angle -= 2*M_PI;
 	
-	tft.fillScreen(ST77XX_BLACK);
-	if (debug_flip) tft.fillCircle(50, 50, 40, ST77XX_GREEN);
-	debug_flip = !debug_flip;
+	// // tft.fillScreen(ST77XX_BLACK);
+	// // if (debug_flip) tft.fillCircle(50, 50, 40, ST77XX_GREEN);
+	// // debug_flip = !debug_flip;
 	
-	if (note_freq.available()) {
-		float f = note_freq.read();
-		Serial.print("freq: "); Serial.println(f);
-		tft.setCursor(30, 120);
-		tft.print(f);
-	}
+	// if (note_freq.available()) {
+	// 	float f = note_freq.read();
+	// 	Serial.print("freq: "); Serial.println(f);
+	// 	tft.setCursor(30, 120);
+	// 	tft.print(f);
+	// }
+	
+	feedback_test(loop_total_ms, delta_ms);
+	feedback_update();
 	
 	delay(100);
+	
+	prev_loop_total_ms = loop_total_ms;
 }
 
 

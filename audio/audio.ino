@@ -8,10 +8,10 @@
 
 // interface
 float audio_out_speed_control_norm = 0.5f;
+float audio_out_volume_control_norm = 0.0f;
 bool audio_out_is_playing = false;
 
 // implementation
-#define AUDIO_OUT_VOLUME (0.01)
 #define AUDIO_OUT_SLIDE_SPEED (0.005)
 #define AUDIO_OUT_SAMPLES_PER_BLOCK (128)
 AudioPlayQueue audio_out_queue;
@@ -60,7 +60,7 @@ void update_audio_out() {
 		if (audio_out_dest_speed_norm > AUDIO_OUT_SLIDE_SPEED) {
 			// Calculate samples and put them in the buffer.
 			for (int i = 0; i < AUDIO_OUT_SAMPLES_PER_BLOCK; i++) {
-				sample_buffer[i] = audio_out_samples[int(audio_out_samples_index)] * AUDIO_OUT_VOLUME;
+				sample_buffer[i] = audio_out_samples[int(audio_out_samples_index)] * audio_out_volume_control_norm;
 				
 				audio_out_samples_index += audio_out_dest_speed_norm * (2 / audio_out_src_speed);
 				
@@ -77,17 +77,46 @@ void update_audio_out() {
 	}
 }
 
+const int serial_buffer_size = 4;
+uint8_t serial_buffer[serial_buffer_size];
+int serial_buffer_write_index = 0;
+
+uint8_t pitch_byte = 0;
+uint8_t volume_byte = 0;
+
 void loop() {
 	if (Serial1.available()) {
-		uint8_t serial_byte;
-		Serial1.readBytes(&serial_byte, 1);
-		
-		if (serial_byte == 0) {
+		Serial1.readBytes(&serial_buffer[serial_buffer_write_index], 1);
+    
+    switch (serial_buffer_write_index) {
+      case 0:
+        if (serial_buffer[0] == 'p') serial_buffer_write_index++;
+        else serial_buffer_write_index = 0;
+        break;
+      case 2:
+        if (serial_buffer[2] == 'v') serial_buffer_write_index++;
+        else serial_buffer_write_index = 0;
+        break;
+      case serial_buffer_size-1:
+        // Serial read is complete.
+        
+        pitch_byte = serial_buffer[1];
+        volume_byte = serial_buffer[3];
+        
+        // Reset buffer
+        serial_buffer_write_index = 0;
+        break;
+      default:
+        if (++serial_buffer_write_index >= serial_buffer_size) serial_buffer_write_index = 0;
+        break;
+    }
+    
+		if (pitch_byte == 0) {
 			audio_out_is_playing = false;
 		} else {
-			audio_out_is_playing = true;
-			audio_out_speed_control_norm = (serial_byte-1) / 254.0f;
-			Serial.println(audio_out_speed_control_norm);
+      audio_out_is_playing = true;
+			audio_out_volume_control_norm = volume_byte / 255.0f;
+			audio_out_speed_control_norm = (pitch_byte-1) / 254.0f;
 		}
 	}
 	
