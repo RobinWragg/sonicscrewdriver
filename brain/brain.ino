@@ -9,7 +9,7 @@ NPN: BC846(B) SOT-23
 laser
 spectrometer
 thermometer
-air quality etc
+pressure, air quality etc?
 microphone
 torch, white
 torch, uv
@@ -99,10 +99,6 @@ void setup() {
 	tft.fillScreen(ST77XX_BLACK);
 	tft.setFont(&FreeMonoBold12pt7b);
 	tft.setTextColor(ST77XX_WHITE);
-	
-	
-	
-	
 	
 	// rwtodo: this is temp audio stuff.
 	AudioMemory(30); // notefreq requires less than 30. rwtodo: increase this if FFT doesn't work.
