@@ -76,7 +76,8 @@ void feedback_update(int32_t tt, int32_t dt) {
 	serial_volume_byte = feedback_volume * 255 * 0.01; // rwtodo: remove the float here for proper volume control.
 	
 	static int32_t prev_serial_write_tt = 0;
-	if (tt - prev_serial_write_tt > 100) {
+	// teensy3 can read 1 byte per ~3ms, so 5ms was chosen to give ample room to prevent serial overflow.
+	if (tt - prev_serial_write_tt > serial_buffer_size * 5) {
 		Serial1.write(serial_buffer, serial_buffer_size);
 		prev_serial_write_tt = tt;
 	}	
