@@ -20,6 +20,7 @@ motor
 // rwtodo:
 // put a 100k resistor between the amp's GAIN pin and 3.3v, instead of the blue wire, for minimum gain, as the amp has high current draw.
 // after teensy3.2's final RAM requirements are known, generate a new raw file that is as slow as possible. 0.3 speed?
+// GPS: https://www.adafruit.com/product/790
 
 //////////////////////////////////////////////////////////
 // pins
@@ -73,10 +74,12 @@ void feedback_update(int32_t tt, int32_t dt) {
 		analogWrite(TORCH_PWM_PIN, 0);
 	}
 	
+	// Send data to teensy3 over serial
 	serial_volume_byte = feedback_volume * 255 * 0.01; // rwtodo: remove the float here for proper volume control.
 	
 	static int32_t prev_serial_write_tt = 0;
-	// teensy3 can read 1 byte per ~3ms, so 5ms was chosen to give ample room to prevent serial overflow.
+	
+	// teensy3 can read 1 byte per ~3ms, so 5ms per byte was chosen here to give ample room to prevent serial overflow.
 	if (tt - prev_serial_write_tt > serial_buffer_size * 5) {
 		Serial1.write(serial_buffer, serial_buffer_size);
 		prev_serial_write_tt = tt;
