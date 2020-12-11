@@ -1,4 +1,12 @@
 
+/*
+Next Steps
+----------
+Prototype an AC detector circuit using the basic darlington triple schematic
+Try reducing the number of wires from the microphone. Learn what each one does before commiting to removing any.
+Experiment with cutting steel
+*/
+
 /* SMD parts
 Diode: 1N5817 0805 SOD323
 Pad: TPTP10R
