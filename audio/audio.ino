@@ -32,7 +32,7 @@ void setup() {
 	audio_out_samples = (int16_t*)audio_out_data;
 	
 	Serial.begin(9600);
-	Serial1.begin(9600); // rwtodo: maybe bump this up slightly on both chips. Test the maximum.
+	Serial1.begin(9600);
 	
 	AudioMemory(3); // audio out requires a minimum of 2. 3 for safety.
 	

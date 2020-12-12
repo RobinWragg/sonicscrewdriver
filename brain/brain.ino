@@ -4,7 +4,7 @@ Next Steps
 ----------
 Prototype an AC detector circuit using the basic darlington triple schematic
 Try reducing the number of wires from the microphone. Learn what each one does before commiting to removing any.
-Experiment with cutting steel
+Experiment with cutting steel, if it goes well then you can get 25mm tube.
 */
 
 /* SMD parts
@@ -26,9 +26,11 @@ motor
 */
 
 // rwtodo:
+// Increase reliability and error-handling of teensy3
 // put a 100k resistor between the amp's GAIN pin and 3.3v, instead of the blue wire, for minimum gain, as the amp has high current draw.
 // after teensy3.2's final RAM requirements are known, generate a new raw file that is as slow as possible. 0.3 speed?
 // GPS: https://www.adafruit.com/product/790
+// optimise audio-out sample rate
 
 //////////////////////////////////////////////////////////
 // pins
@@ -41,17 +43,27 @@ motor
 //////////////////////////////////////////////////////////
 // general
 //
-#define PWM_BIT_DEPTH (14)
-int PWM_MAX_VALUE; // Defined in setup()
+#define DAC_BIT_DEPTH (14)
+int DAC_MAX_VALUE; // Defined in setup()
+
+#define ADC_BIT_DEPTH (10)
+int ADC_MAX_VALUE; // Defined in setup()
 
 float lerp(float a, float b, float t) {
 	return a + (b-a)*t;
 }
 
+float readNorm(int pin) {
+	return analogRead(pin) / (float)ADC_MAX_VALUE;
+}
+
+float writeNorm(int pin, float input) {
+	return analogWrite(pin, input * DAC_MAX_VALUE);
+}
+
 //////////////////////////////////////////////////////////
 // feedback
 //
-
 bool feedback_on = false;
 /* rwtodo:
 bool feedback_uv_on =
@@ -74,8 +86,8 @@ void feedback_update(int32_t tt, int32_t dt) {
 		
 		float light_intensity = feedback_intensity * feedback_intensity;
 		
-		analogWrite(UV_PWM_PIN, light_intensity * PWM_MAX_VALUE);
-		analogWrite(TORCH_PWM_PIN, light_intensity * 0.04f * PWM_MAX_VALUE);
+		writeNorm(UV_PWM_PIN, light_intensity);
+		writeNorm(TORCH_PWM_PIN, light_intensity * 0.04f);
 	} else {
 		serial_pitch_byte = 0;
 		analogWrite(UV_PWM_PIN, 0);
@@ -104,9 +116,26 @@ void feedback_test(int32_t tt, int32_t dt) {
 }
 
 //////////////////////////////////////////////////////////
+// antenna
+//
+void antenna_frame() {
+	static int y = 0;
+	
+	float front_signal_norm = readNorm(?);
+	float rear_signal_norm = readNorm(?);
+	
+	tft.drawLine(0, y, TFT_WIDTH, 0, ST77XX_BLACK); // clear
+	tft.drawPixel(front_signal_norm * TFT_WIDTH, y, ST77XX_GREEN);
+	tft.drawPixel(rear_signal_norm * TFT_WIDTH, y, ST77XX_RED);
+	
+	if (++y >= TFT_HEIGHT) y = 0;
+	
+	delay(1);
+}
+
+//////////////////////////////////////////////////////////
 // audio in
 // https://learn.adafruit.com/adafruit-i2s-mems-microphone-breakout/
-
 #include <Audio.h>
 
 AudioInputI2S i2s;
@@ -175,8 +204,10 @@ void tft_test(int32_t tt, int32_t dt) {
 //
 
 void setup() {
-	analogWriteResolution(PWM_BIT_DEPTH); // rwtodo: refactor this dependency sensibly.
-	PWM_MAX_VALUE = powf(2, PWM_BIT_DEPTH) - 1;
+	analogWriteResolution(DAC_BIT_DEPTH);
+	DAC_MAX_VALUE = powf(2, DAC_BIT_DEPTH) - 1;
+	analogWriteResolution(ADC_BIT_DEPTH);
+	ADC_MAX_VALUE = powf(2, ADC_BIT_DEPTH) - 1;
 	
 	pinMode(LASER_PWM_PIN, OUTPUT);
 	pinMode(UV_PWM_PIN, OUTPUT);
