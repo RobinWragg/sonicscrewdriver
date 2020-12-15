@@ -5,6 +5,7 @@ Next Steps
 Prototype an AC detector circuit using the basic darlington triple schematic
 Try reducing the number of wires from the microphone. Learn what each one does before commiting to removing any.
 Experiment with cutting steel, if it goes well then you can get 25mm tube.
+Make sure you can power the tft through its 3v pin. maybe modify the board, removing 5v tolerance to confirm the board redesign will work.
 */
 
 /* SMD parts
@@ -22,7 +23,8 @@ microphone
 torch, white
 torch, uv
 accent lights
-motor
+motor?
+double electromagnetism antenna
 */
 
 // rwtodo:
@@ -39,15 +41,13 @@ motor
 #define UV_PWM_PIN (2)
 #define TORCH_PWM_PIN (3)
 #define UNAVAILABLE_PIN (23)
+#define FRONT_ANTENNA_PIN (14)
 
 //////////////////////////////////////////////////////////
 // general
 //
 #define DAC_BIT_DEPTH (14)
 int DAC_MAX_VALUE; // Defined in setup()
-
-#define ADC_BIT_DEPTH (10)
-int ADC_MAX_VALUE; // Defined in setup()
 
 float lerp(float a, float b, float t) {
 	return a + (b-a)*t;
@@ -57,8 +57,62 @@ float readNorm(int pin) {
 	return analogRead(pin) / (float)ADC_MAX_VALUE;
 }
 
-float writeNorm(int pin, float input) {
-	return analogWrite(pin, input * DAC_MAX_VALUE);
+void writeNorm(int pin, float input) {
+	analogWrite(pin, input * DAC_MAX_VALUE);
+}
+
+//////////////////////////////////////////////////////////
+// TFT
+// https://learn.adafruit.com/adafruit-1-14-240x135-color-tft-breakout
+#include <Adafruit_GFX.h>
+#include <Adafruit_ST7789.h>
+#include <SPI.h>
+#include <Fonts/FreeMonoBold12pt7b.h>
+#define TFT_RST (7)
+#define TFT_DC (9)
+#define TFT_CS (10)
+#define TFT_WIDTH (135)
+#define TFT_HEIGHT (240)
+Adafruit_ST7789 tft = Adafruit_ST7789(TFT_CS, TFT_DC, TFT_RST);
+
+void tft_init() {
+	tft.init(TFT_WIDTH, TFT_HEIGHT); // rwtodo: this takes a long time, 500ms or so.
+	tft.fillScreen(ST77XX_BLACK);
+	tft.setFont(&FreeMonoBold12pt7b);
+	tft.setTextColor(ST77XX_WHITE);
+}
+
+void tft_test(int32_t tt, int32_t dt) {
+	static int timing_result = 0;
+	
+	int start = millis();
+	
+	float one_second_loop_norm = (tt % 1000) / 1000.0f;
+	
+	int y = lerp(0, 1, one_second_loop_norm) * TFT_HEIGHT;
+	
+	if (y < 10) tft.fillScreen(ST77XX_BLACK);
+	tft.fillCircle(50, y, 40, ST77XX_GREEN);
+	
+	tft.setCursor(30, 70);
+	tft.print(timing_result);
+	tft.print("ms");
+	
+	// reference:
+	// tft.drawPixel(tft.width()/2, tft.height()/2, ST77XX_GREEN);
+	// tft.drawLine(10, 10, 100, 50, ST77XX_YELLOW);
+	// tft.setCursor(30, 70);
+	// tft.print("omg");
+	// tft.drawFastHLine(10, 10, 50, ST77XX_BLUE);
+	// tft.drawFastVLine(10, 10, 50, ST77XX_RED);
+	// tft.drawRect(10, 10, 20, 20, ST77XX_GREEN);
+	// tft.fillRect(20, 30, 40, 50, ST77XX_BLUE);
+	// tft.drawCircle(10, 10, 20, ST77XX_RED);
+	// tft.fillCircle(10, 10, 20, ST77XX_RED);
+	// tft.drawRoundRect(10, 10, 20, 30, 5, ST77XX_YELLOW);
+	
+	int end = millis();
+	timing_result = end - start;
 }
 
 //////////////////////////////////////////////////////////
@@ -121,23 +175,23 @@ void feedback_test(int32_t tt, int32_t dt) {
 void antenna_frame() {
 	static int y = 0;
 	
-	float front_signal_norm = readNorm(?);
-	float rear_signal_norm = readNorm(?);
+	float front_signal_norm = readNorm(FRONT_ANTENNA_PIN);
+	// float rear_signal_norm = readNorm(?); // rwtodo
+	float rear_signal_norm = 0;
 	
-	tft.drawLine(0, y, TFT_WIDTH, 0, ST77XX_BLACK); // clear
+	tft.drawLine(0, y, TFT_WIDTH, y, ST77XX_BLACK); // clear
 	tft.drawPixel(front_signal_norm * TFT_WIDTH, y, ST77XX_GREEN);
 	tft.drawPixel(rear_signal_norm * TFT_WIDTH, y, ST77XX_RED);
 	
 	if (++y >= TFT_HEIGHT) y = 0;
 	
-	delay(1);
+	delayMicroseconds(100);
 }
 
 //////////////////////////////////////////////////////////
 // audio in
 // https://learn.adafruit.com/adafruit-i2s-mems-microphone-breakout/
 #include <Audio.h>
-
 AudioInputI2S i2s;
 AudioAnalyzeFFT256 fft;
 AudioAnalyzeNoteFrequency note_freq;
@@ -145,69 +199,11 @@ AudioConnection patchCord1(i2s, 0, fft, 0);
 AudioConnection patchCord2(i2s, 0, note_freq, 0);
 
 //////////////////////////////////////////////////////////
-// TFT
-// https://learn.adafruit.com/adafruit-1-14-240x135-color-tft-breakout
-
-#include <Adafruit_GFX.h>
-#include <Adafruit_ST7789.h>
-#include <SPI.h>
-#include <Fonts/FreeMonoBold12pt7b.h>
-#define TFT_RST (7)
-#define TFT_DC (9)
-#define TFT_CS (10)
-#define TFT_WIDTH (135)
-#define TFT_HEIGHT (240)
-Adafruit_ST7789 tft = Adafruit_ST7789(TFT_CS, TFT_DC, TFT_RST);
-
-void tft_init() {
-	tft.init(TFT_WIDTH, TFT_HEIGHT); // rwtodo: this takes a long time, 500ms or so.
-	tft.fillScreen(ST77XX_BLACK);
-	tft.setFont(&FreeMonoBold12pt7b);
-	tft.setTextColor(ST77XX_WHITE);
-}
-
-void tft_test(int32_t tt, int32_t dt) {
-	static int timing_result = 0;
-	
-	int start = millis();
-	
-	float one_second_loop_norm = (tt % 1000) / 1000.0f;
-	
-	int y = lerp(0, 1, one_second_loop_norm) * TFT_HEIGHT;
-	
-	if (y < 10) tft.fillScreen(ST77XX_BLACK);
-	tft.fillCircle(50, y, 40, ST77XX_GREEN);
-	
-	tft.setCursor(30, 70);
-	tft.print(timing_result);
-	tft.print("ms");
-	
-	// reference:
-	// tft.drawPixel(tft.width()/2, tft.height()/2, ST77XX_GREEN);
-	// tft.drawLine(10, 10, 100, 50, ST77XX_YELLOW);
-	// tft.setCursor(30, 70);
-	// tft.print("omg");
-	// tft.drawFastHLine(10, 10, 50, ST77XX_BLUE);
-	// tft.drawFastVLine(10, 10, 50, ST77XX_RED);
-	// tft.drawRect(10, 10, 20, 20, ST77XX_GREEN);
-	// tft.fillRect(20, 30, 40, 50, ST77XX_BLUE);
-	// tft.drawCircle(10, 10, 20, ST77XX_RED);
-	// tft.fillCircle(10, 10, 20, ST77XX_RED);
-	// tft.drawRoundRect(10, 10, 20, 30, 5, ST77XX_YELLOW);
-	
-	int end = millis();
-	timing_result = end - start;
-}
-
-//////////////////////////////////////////////////////////
 // setup + loop
 //
-
 void setup() {
 	analogWriteResolution(DAC_BIT_DEPTH);
 	DAC_MAX_VALUE = powf(2, DAC_BIT_DEPTH) - 1;
-	analogWriteResolution(ADC_BIT_DEPTH);
-	ADC_MAX_VALUE = powf(2, ADC_BIT_DEPTH) - 1;
 	
 	pinMode(LASER_PWM_PIN, OUTPUT);
 	pinMode(UV_PWM_PIN, OUTPUT);
