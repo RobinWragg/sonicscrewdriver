@@ -9,7 +9,7 @@ Make sure you can power the tft through its 3v pin. maybe modify the board, remo
 */
 
 /* SMD parts
-Diode: 1N5817 0805 SOD323
+Diode: 1N5817WS 0805 SOD323
 Pad: TPTP10R
 NPN: BC846(B) SOT-23
 */
@@ -37,17 +37,20 @@ double electromagnetism antenna
 //////////////////////////////////////////////////////////
 // pins
 //
-#define LASER_PWM_PIN (4)
 #define UV_PWM_PIN (2)
 #define TORCH_PWM_PIN (3)
-#define UNAVAILABLE_PIN (23)
+#define LASER_PWM_PIN (4)
 #define FRONT_ANTENNA_PIN (14)
+#define REAR_ANTENNA_PIN (15)
+#define UNAVAILABLE_PIN (23)
 
 //////////////////////////////////////////////////////////
 // general
 //
 #define DAC_BIT_DEPTH (14)
 int DAC_MAX_VALUE; // Defined in setup()
+#define ADC_BIT_DEPTH (12)
+int ADC_MAX_VALUE; // Defined in setup()
 
 float lerp(float a, float b, float t) {
 	return a + (b-a)*t;
@@ -174,14 +177,25 @@ void feedback_test(int32_t tt, int32_t dt) {
 //
 void antenna_frame() {
 	static int y = 0;
+	static int prev_front = 0;
+	static int prev_rear = 0;
 	
 	float front_signal_norm = readNorm(FRONT_ANTENNA_PIN);
-	// float rear_signal_norm = readNorm(?); // rwtodo
-	float rear_signal_norm = 0;
+	float rear_signal_norm = readNorm(REAR_ANTENNA_PIN);
 	
 	tft.drawLine(0, y, TFT_WIDTH, y, ST77XX_BLACK); // clear
-	tft.drawPixel(front_signal_norm * TFT_WIDTH, y, ST77XX_GREEN);
-	tft.drawPixel(rear_signal_norm * TFT_WIDTH, y, ST77XX_RED);
+	
+	if (y == 0) {
+		tft.drawPixel(front_signal_norm * TFT_WIDTH, y, ST77XX_GREEN);
+		prev_front = 0;
+		tft.drawPixel(rear_signal_norm * TFT_WIDTH, y, ST77XX_RED);
+		prev_rear = 0;
+	} else {
+		tft.drawLine(prev_front, y-1, front_signal_norm * TFT_WIDTH, y, ST77XX_GREEN);
+		prev_front = front_signal_norm * TFT_WIDTH;
+		tft.drawLine(prev_rear, y-1, rear_signal_norm * TFT_WIDTH, y, ST77XX_RED);
+		prev_rear = rear_signal_norm * TFT_WIDTH;
+	}
 	
 	if (++y >= TFT_HEIGHT) y = 0;
 	
@@ -204,10 +218,14 @@ AudioConnection patchCord2(i2s, 0, note_freq, 0);
 void setup() {
 	analogWriteResolution(DAC_BIT_DEPTH);
 	DAC_MAX_VALUE = powf(2, DAC_BIT_DEPTH) - 1;
+	analogReadResolution(ADC_BIT_DEPTH);
+	ADC_MAX_VALUE = powf(2, ADC_BIT_DEPTH) - 1;
 	
-	pinMode(LASER_PWM_PIN, OUTPUT);
 	pinMode(UV_PWM_PIN, OUTPUT);
 	pinMode(TORCH_PWM_PIN, OUTPUT);
+	pinMode(LASER_PWM_PIN, OUTPUT);
+	pinMode(FRONT_ANTENNA_PIN, INPUT); // rwtodo: not completely sure whether commenting this out is better. Test with both antennas.
+	pinMode(REAR_ANTENNA_PIN, INPUT); // rwtodo: not completely sure whether commenting this out is better. Test with both antennas.
 	
 	Serial.begin(9600);
 	
@@ -218,7 +236,7 @@ void setup() {
 	
 	// rwtodo: this is temp audio stuff.
 	AudioMemory(30); // notefreq requires less than 30. rwtodo: increase this if FFT doesn't work.
-	note_freq.begin(0.3f); // certainty. 
+	note_freq.begin(0.3f); // certainty.
 }
 
 float debug_angle = 0;
