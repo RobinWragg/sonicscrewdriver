@@ -2,3 +2,5 @@
 *.sublime-workspace
 *.b#*
 *.s#*
+*.job
+*.pro

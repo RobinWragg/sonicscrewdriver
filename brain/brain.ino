@@ -2,6 +2,7 @@
 /*
 Next Steps
 ----------
+Decide what to do with thermometer, USBC, rotary encoder, laser and microphone.
 wait for that order to cancel, then order 22od 20id steel tube and 18od 16id steel tube.
 Try making touch-buttons with the 3M bolts and a darlington pair. Remember to ground yourself.
 When SMD 20M resistors arrive, try making a voltage divider with them for the antenna.
