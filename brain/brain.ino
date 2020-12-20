@@ -2,10 +2,11 @@
 /*
 Next Steps
 ----------
-explore inner diameter of 18mm throughout, except for connecting sections. could be 20mm or 22mm outer diameter.
-Prototype an AC detector circuit using the basic darlington triple schematic
+wait for that order to cancel, then order 22od 20id steel tube and 18od 16id steel tube.
+Try making touch-buttons with the 3M bolts and a darlington pair. Remember to ground yourself.
+When SMD 20M resistors arrive, try making a voltage divider with them for the antenna.
 Try reducing the number of wires from the microphone. Learn what each one does before commiting to removing any.
-Experiment with cutting steel, if it goes well then you can get 25mm tube.
+Practice chamfering.
 Make sure you can power the tft through its 3v pin. maybe modify the board, removing 5v tolerance to confirm the board redesign will work.
 */
 
