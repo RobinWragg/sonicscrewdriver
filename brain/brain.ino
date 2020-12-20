@@ -2,6 +2,7 @@
 /*
 Next Steps
 ----------
+explore inner diameter of 18mm throughout, except for connecting sections. could be 20mm or 22mm outer diameter.
 Prototype an AC detector circuit using the basic darlington triple schematic
 Try reducing the number of wires from the microphone. Learn what each one does before commiting to removing any.
 Experiment with cutting steel, if it goes well then you can get 25mm tube.
