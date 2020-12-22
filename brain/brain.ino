@@ -2,13 +2,13 @@
 /*
 Next Steps
 ----------
-Decide what to do with thermometer, USBC, rotary encoder, laser and microphone.
-wait for that order to cancel, then order 22od 20id steel tube and 18od 16id steel tube.
+test infrared and see if you can get PWM working after power cycling.
+add resistor to the thermometer on the new probe pcb.
 Try making touch-buttons with the 3M bolts and a darlington pair. Remember to ground yourself.
-When SMD 20M resistors arrive, try making a voltage divider with them for the antenna.
+Try making a voltage divider with the 20M SMD resistors for the antenna.
 Try reducing the number of wires from the microphone. Learn what each one does before commiting to removing any.
+Try out the conductive paint.
 Practice chamfering.
-Make sure you can power the tft through its 3v pin. maybe modify the board, removing 5v tolerance to confirm the board redesign will work.
 */
 
 /* SMD parts
