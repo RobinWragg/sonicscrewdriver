@@ -9,6 +9,7 @@ Try making a voltage divider with the 20M SMD resistors for the antenna.
 Try reducing the number of wires from the microphone. Learn what each one does before commiting to removing any.
 Try out the conductive paint.
 Practice chamfering.
+buy an adafruit micro-lipo usb c module when you know which pressure sensor to get.
 */
 
 /* SMD parts
@@ -43,8 +44,7 @@ double electromagnetism antenna
 #define UV_PWM_PIN (2)
 #define TORCH_PWM_PIN (3)
 #define LASER_PWM_PIN (4)
-#define FRONT_ANTENNA_PIN (14)
-#define REAR_ANTENNA_PIN (15)
+#define ANTENNA_PIN (14)
 #define UNAVAILABLE_PIN (23)
 
 //////////////////////////////////////////////////////////
@@ -176,37 +176,83 @@ void feedback_test(int32_t tt, int32_t dt) {
 }
 
 //////////////////////////////////////////////////////////
-// antenna
+// thermometer
 //
-void antenna_frame() {
-	static int y = 0;
-	static int prev_front = 0;
-	static int prev_rear = 0;
-	
-	float front_signal_norm = readNorm(FRONT_ANTENNA_PIN);
-	float rear_signal_norm = readNorm(REAR_ANTENNA_PIN);
-	
-	tft.drawLine(0, y, TFT_WIDTH, y, ST77XX_BLACK); // clear
-	
-	if (y == 0) {
-		tft.drawPixel(front_signal_norm * TFT_WIDTH, y, ST77XX_GREEN);
-		prev_front = 0;
-		tft.drawPixel(rear_signal_norm * TFT_WIDTH, y, ST77XX_RED);
-		prev_rear = 0;
-	} else {
-		tft.drawLine(prev_front, y-1, front_signal_norm * TFT_WIDTH, y, ST77XX_GREEN);
-		prev_front = front_signal_norm * TFT_WIDTH;
-		tft.drawLine(prev_rear, y-1, rear_signal_norm * TFT_WIDTH, y, ST77XX_RED);
-		prev_rear = rear_signal_norm * TFT_WIDTH;
+#include <Wire.h>
+#include <SparkFunMLX90614.h>
+IRTherm thermometer;
+
+void thermometer_print() {
+	if (thermometer.read()) {
+		Serial.print("THERM object:"); Serial.print(thermometer.object());
+		Serial.print(" ambient:"); Serial.print(thermometer.ambient());
+		Serial.println(" C");
 	}
-	
-	if (++y >= TFT_HEIGHT) y = 0;
-	
-	delayMicroseconds(100);
 }
 
 //////////////////////////////////////////////////////////
-// audio in
+// antenna
+//
+int antenna_sample_rate;
+
+void antenna_render_graph(int x, int y, int height) {
+	static int16_t samples[TFT_WIDTH] = {};
+	
+	if (x == 0) {
+		auto samples_start = micros();
+		for (int i = 0; i < TFT_WIDTH; i++) {
+			samples[i] = analogRead(ANTENNA_PIN);
+			delayMicroseconds(300);
+		}
+		auto samples_period_micros = micros() - samples_start;
+		float samples_period = samples_period_micros / 1000000.0f;
+		
+		if (samples_period <= 0.0f) samples_period = 0.00000001f;
+		antenna_sample_rate = TFT_WIDTH / samples_period;
+	}
+	
+	auto sample_color = ST77XX_GREEN;
+	
+	// clear vertical line
+	tft.drawLine(x, y, x, y + height, ST77XX_RED);
+	
+	
+	// signal
+	float sample_norm = samples[x] / (float)ADC_MAX_VALUE;
+	// float sample_norm = readNorm(ANTENNA_PIN);
+	
+	if (x == 0) {
+		tft.drawPixel(x, y + sample_norm * height, sample_color);
+	} else {
+		float prev_sample_norm = samples[x-1] / float(ADC_MAX_VALUE);
+		// tft.drawLine(x - 1, y + prev_sample_norm * height, x, y + sample_norm * height, sample_color);
+		tft.drawPixel(x, y + sample_norm * height, sample_color);
+	}
+}
+
+void antenna_render(int x) {
+	const int graph_height = 100;
+	const int text_line_height = 20;
+	
+	antenna_render_graph(x, 0, graph_height);
+	
+	if (x == 0) {
+		int y = graph_height + text_line_height;
+		
+		tft.fillRect(0, graph_height, TFT_WIDTH, TFT_HEIGHT - graph_height, ST77XX_BLUE);
+		tft.setCursor(0, y);
+		tft.print("<n>Hz");
+		
+		y += text_line_height;
+		
+		// tft.drawRect(0, y - text_line_height, TFT_WIDTH, text_line_height, ST77XX_BLUE);
+		tft.setCursor(0, y);
+		tft.print(antenna_sample_rate);
+	}
+}
+
+//////////////////////////////////////////////////////////
+// microphone
 // https://learn.adafruit.com/adafruit-i2s-mems-microphone-breakout/
 #include <Audio.h>
 AudioInputI2S i2s;
@@ -215,10 +261,52 @@ AudioAnalyzeNoteFrequency note_freq;
 AudioConnection patchCord1(i2s, 0, fft, 0);
 AudioConnection patchCord2(i2s, 0, note_freq, 0);
 
+void microphone_print() {
+	Serial.print("MICROPH freq:"); Serial.print(note_freq.read());
+	Serial.print(" certainty:"); Serial.println(note_freq.probability());
+}
+
+//////////////////////////////////////////////////////////
+// spectrometer
+//
+#include <Adafruit_AS7341.h>
+Adafruit_AS7341 spectrometer;
+
+void spectrometer_init() {
+	if (!spectrometer.begin()){
+	  Serial.println("Could not find spectrometer");
+	}
+
+	spectrometer.setATIME(100); // rwtodo: don't know what these mean
+	spectrometer.setASTEP(999); // rwtodo: don't know what these mean
+	spectrometer.setGain(AS7341_GAIN_256X); // rwtodo: don't know what these mean
+}
+
+void spectrometer_print() {
+	if (spectrometer.readAllChannels()) {
+		Serial.print("F1,415nm:"); Serial.print(spectrometer.getChannel(AS7341_CHANNEL_415nm_F1));
+		Serial.print(" F2,445nm:"); Serial.print(spectrometer.getChannel(AS7341_CHANNEL_445nm_F2));
+		Serial.print(" F3,480nm:"); Serial.print(spectrometer.getChannel(AS7341_CHANNEL_480nm_F3));
+		Serial.print(" F4,515nm:"); Serial.print(spectrometer.getChannel(AS7341_CHANNEL_515nm_F4));
+		Serial.print(" F5,555nm:"); Serial.print(spectrometer.getChannel(AS7341_CHANNEL_555nm_F5));
+		Serial.print(" F6,590nm:"); Serial.print(spectrometer.getChannel(AS7341_CHANNEL_590nm_F6));
+		Serial.print(" F7,630nm:"); Serial.print(spectrometer.getChannel(AS7341_CHANNEL_630nm_F7));
+		Serial.print(" F8,680nm:"); Serial.print(spectrometer.getChannel(AS7341_CHANNEL_680nm_F8));
+		Serial.print(" Clear:"); Serial.print(spectrometer.getChannel(AS7341_CHANNEL_CLEAR));
+		Serial.print(" Near IR:"); Serial.print(spectrometer.getChannel(AS7341_CHANNEL_NIR));
+
+		Serial.println();
+	} else {
+		Serial.println("spectrometer failed to read all channels");
+	}
+}
+
 //////////////////////////////////////////////////////////
 // setup + loop
 //
 void setup() {
+	Serial.begin(9600);
+	
 	analogWriteResolution(DAC_BIT_DEPTH);
 	DAC_MAX_VALUE = powf(2, DAC_BIT_DEPTH) - 1;
 	analogReadResolution(ADC_BIT_DEPTH);
@@ -227,10 +315,15 @@ void setup() {
 	pinMode(UV_PWM_PIN, OUTPUT);
 	pinMode(TORCH_PWM_PIN, OUTPUT);
 	pinMode(LASER_PWM_PIN, OUTPUT);
-	pinMode(FRONT_ANTENNA_PIN, INPUT); // rwtodo: not completely sure whether commenting this out is better. Test with both antennas.
-	pinMode(REAR_ANTENNA_PIN, INPUT); // rwtodo: not completely sure whether commenting this out is better. Test with both antennas.
+	pinMode(ANTENNA_PIN, INPUT); // rwtodo: not completely sure whether commenting this out is better. Test with both antennas.
 	
-	Serial.begin(9600);
+	Wire.begin(); // For I2C: thermometer, spectrometer
+	
+	if (thermometer.begin() == false) {
+		Serial.println("thermometer.begin() failed!");
+	} else {
+		thermometer.setUnit(TEMP_C); // Kelvin
+	}
 	
 	// Setup communication with audio-out core
 	Serial1.begin(9600); // rwtodo: maybe bump this up slightly on both chips. Test the maximum.
@@ -239,37 +332,40 @@ void setup() {
 	
 	// rwtodo: this is temp audio stuff.
 	AudioMemory(30); // notefreq requires less than 30. rwtodo: increase this if FFT doesn't work.
-	note_freq.begin(0.3f); // certainty.
+	note_freq.begin(0.7f); // certainty.
+	
+	spectrometer_init();
 }
 
 float debug_angle = 0;
 bool debug_flip = false;
 
-int32_t prev_loop_total_ms = 0;
+int32_t prev_tt = 0;
 
 void loop() {
-	int32_t loop_total_ms = millis();
-	int32_t delta_ms = loop_total_ms - prev_loop_total_ms;
+	int32_t tt = millis();
+	int32_t dt = tt - prev_tt;
 	
-	if (delta_ms > 30) {
-		Serial.print("WARNING: dt="); Serial.println(delta_ms);
-	}
+	// feedback_update(tt, dt);
 	
-	tft_test(loop_total_ms, delta_ms);
+	// static int x = 0;
 	
-	if (note_freq.available()) {
-		float f = note_freq.read();
-		Serial.print("note freq: "); Serial.println(f);
-	}
+	// antenna_render(x);
 	
-	feedback_test(loop_total_ms, delta_ms);
-	feedback_update(loop_total_ms, delta_ms);
+	// if (++x >= TFT_WIDTH) x = 0;
 	
-	analogWrite(LASER_PWM_PIN, (sinf(loop_total_ms*0.003)*0.5+0.5) * PWM_MAX_VALUE);
+	Serial.println();
+	microphone_print();
+	thermometer_print();
+	spectrometer_print();
 	
-	delay(10);
+	delay(300);
 	
-	prev_loop_total_ms = loop_total_ms;
+	tft.fillScreen(ST77XX_BLACK);
+	delay(100);
+	tft.fillScreen(ST77XX_GREEN);
+	
+	prev_tt = tt;
 }
 
 

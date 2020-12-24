@@ -173,10 +173,6 @@
 <board>
 <plain>
 <circle x="10" y="10" radius="10" width="0.1524" layer="20"/>
-<wire x1="3" y1="9" x2="3" y2="12" width="0.1524" layer="20"/>
-<wire x1="3" y1="12" x2="17" y2="12" width="0.1524" layer="20"/>
-<wire x1="17" y1="12" x2="17" y2="9" width="0.1524" layer="20"/>
-<wire x1="17" y1="9" x2="3" y2="9" width="0.1524" layer="20"/>
 </plain>
 <libraries>
 <library name="general">
