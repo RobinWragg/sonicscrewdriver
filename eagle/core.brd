@@ -1811,10 +1811,24 @@ design rules under a new name.</description>
 <contactref element="T3" pad="2"/>
 <contactref element="T4" pad="2"/>
 <contactref element="GND" pad="TP"/>
-<contactref element="U$3" pad="14"/>
 <contactref element="U$3" pad="BASE2"/>
 <contactref element="U$3" pad="BASE1"/>
+<contactref element="U$3" pad="16"/>
+<wire x1="93.03" y1="13.97" x2="97.47" y2="11.43" width="0" layer="19" extent="1-1"/>
+<wire x1="77.785" y1="14.605" x2="93.03" y2="13.97" width="0" layer="19" extent="1-16"/>
+<wire x1="70.805" y1="14.605" x2="77.785" y2="14.605" width="0" layer="19" extent="16-16"/>
+<wire x1="65.405" y1="2.22" x2="70.805" y2="14.605" width="0" layer="19" extent="1-16"/>
+<wire x1="48.575" y1="8.89" x2="65.405" y2="2.22" width="0" layer="19" extent="1-16"/>
+<wire x1="42.23" y1="8.89" x2="48.575" y2="8.89" width="0" layer="19" extent="16-16"/>
+<wire x1="35.56" y1="13.97" x2="42.23" y2="8.89" width="0" layer="19" extent="16-16"/>
+<wire x1="14.92" y1="7.155" x2="35.56" y2="13.97" width="0" layer="19" extent="1-16"/>
+<wire x1="11.11" y1="7.155" x2="14.92" y2="7.155" width="0" layer="19" extent="1-1"/>
+<wire x1="7.3" y1="7.155" x2="11.11" y2="7.155" width="0" layer="19" extent="1-1"/>
+<wire x1="3.49" y1="7.155" x2="7.3" y2="7.155" width="0" layer="19" extent="1-1"/>
+<wire x1="4.147" y1="4.34" x2="3.49" y2="7.155" width="0" layer="19" extent="1-16"/>
 <wire x1="5.08" y1="2.22" x2="4.147" y2="4.34" width="0" layer="19" extent="1-16"/>
+<wire x1="1.397" y1="13.59" x2="3.49" y2="7.155" width="0" layer="19" extent="1-16"/>
+<wire x1="4.147" y1="15.34" x2="1.397" y2="13.59" width="0" layer="19" extent="16-16"/>
 </signal>
 <signal name="3V">
 <contactref element="R8" pad="2"/>
@@ -1826,7 +1840,7 @@ design rules under a new name.</description>
 <contactref element="R6" pad="2"/>
 <contactref element="R11" pad="2"/>
 <contactref element="3V" pad="TP"/>
-<contactref element="U$3" pad="13"/>
+<contactref element="U$3" pad="15"/>
 <wire x1="87.95" y1="12.7" x2="94.295" y2="9.525" width="0" layer="19" extent="1-1"/>
 <wire x1="75.565" y1="12.38" x2="87.95" y2="12.7" width="0" layer="19" extent="1-16"/>
 <wire x1="73.025" y1="12.38" x2="75.565" y2="12.38" width="0" layer="19" extent="16-16"/>
@@ -1835,7 +1849,7 @@ design rules under a new name.</description>
 <wire x1="44.13" y1="13.97" x2="46.675" y2="13.97" width="0" layer="19" extent="16-16"/>
 <wire x1="26.67" y1="11.43" x2="44.13" y2="13.97" width="0" layer="19" extent="16-16"/>
 <wire x1="10.16" y1="17.46" x2="26.67" y2="11.43" width="0" layer="19" extent="1-16"/>
-<wire x1="1.397" y1="12.09" x2="10.16" y2="17.46" width="0" layer="19" extent="1-16"/>
+<wire x1="1.397" y1="13.09" x2="10.16" y2="17.46" width="0" layer="19" extent="1-16"/>
 </signal>
 <signal name="ENCL">
 <contactref element="R8" pad="1"/>
@@ -2003,6 +2017,8 @@ design rules under a new name.</description>
 </signal>
 <signal name="BCLK">
 <contactref element="U$1" pad="21"/>
+<contactref element="U$3" pad="14"/>
+<wire x1="1.397" y1="12.59" x2="17.78" y2="17.46" width="0" layer="19" extent="1-16"/>
 </signal>
 <signal name="DOUT">
 <contactref element="U$1" pad="8"/>
@@ -2011,6 +2027,8 @@ design rules under a new name.</description>
 </signal>
 <signal name="LRCL">
 <contactref element="U$1" pad="20"/>
+<contactref element="U$3" pad="13"/>
+<wire x1="1.397" y1="12.09" x2="20.32" y2="17.46" width="0" layer="19" extent="1-16"/>
 </signal>
 <signal name="SDA">
 <contactref element="U$1" pad="18"/>

@@ -9129,14 +9129,14 @@ Source: AVX .. aphvc.pdf</description>
 <pinref part="GND" gate="G$1" pin="TP"/>
 </segment>
 <segment>
-<pinref part="U$3" gate="G$1" pin="14"/>
-<wire x1="-180.34" y1="-20.32" x2="-175.26" y2="-20.32" width="0.1524" layer="91"/>
-<label x="-175.26" y="-20.32" size="1.778" layer="95"/>
-</segment>
-<segment>
 <pinref part="U$3" gate="G$1" pin="BASE"/>
 <wire x1="-180.34" y1="-30.48" x2="-175.26" y2="-30.48" width="0.1524" layer="91"/>
 <label x="-175.26" y="-30.48" size="1.778" layer="95"/>
+</segment>
+<segment>
+<pinref part="U$3" gate="G$1" pin="16"/>
+<wire x1="-180.34" y1="-25.4" x2="-175.26" y2="-25.4" width="0.1524" layer="91"/>
+<label x="-175.26" y="-25.4" size="1.778" layer="95"/>
 </segment>
 </net>
 <net name="3V" class="0">
@@ -9186,9 +9186,9 @@ Source: AVX .. aphvc.pdf</description>
 <pinref part="3V" gate="G$1" pin="TP"/>
 </segment>
 <segment>
-<pinref part="U$3" gate="G$1" pin="13"/>
-<wire x1="-180.34" y1="-17.78" x2="-175.26" y2="-17.78" width="0.1524" layer="91"/>
-<label x="-175.26" y="-17.78" size="1.778" layer="95"/>
+<pinref part="U$3" gate="G$1" pin="15"/>
+<wire x1="-180.34" y1="-22.86" x2="-175.26" y2="-22.86" width="0.1524" layer="91"/>
+<label x="-175.26" y="-22.86" size="1.778" layer="95"/>
 </segment>
 </net>
 <net name="ENCL" class="0">
@@ -9364,6 +9364,11 @@ Source: AVX .. aphvc.pdf</description>
 <wire x1="-27.94" y1="66.04" x2="-22.86" y2="66.04" width="0.1524" layer="91"/>
 <label x="-22.86" y="66.04" size="1.778" layer="95"/>
 </segment>
+<segment>
+<pinref part="U$3" gate="G$1" pin="14"/>
+<wire x1="-180.34" y1="-20.32" x2="-175.26" y2="-20.32" width="0.1524" layer="91"/>
+<label x="-175.26" y="-20.32" size="1.778" layer="95"/>
+</segment>
 </net>
 <net name="DOUT" class="0">
 <segment>
@@ -9382,6 +9387,11 @@ Source: AVX .. aphvc.pdf</description>
 <pinref part="U$1" gate="G$1" pin="20"/>
 <wire x1="-27.94" y1="63.5" x2="-22.86" y2="63.5" width="0.1524" layer="91"/>
 <label x="-22.86" y="63.5" size="1.778" layer="95"/>
+</segment>
+<segment>
+<pinref part="U$3" gate="G$1" pin="13"/>
+<wire x1="-180.34" y1="-17.78" x2="-175.26" y2="-17.78" width="0.1524" layer="91"/>
+<label x="-175.26" y="-17.78" size="1.778" layer="95"/>
 </segment>
 </net>
 <net name="TFTCS" class="0">
