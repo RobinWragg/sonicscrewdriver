@@ -176,8 +176,12 @@ void feedback_test(int32_t tt, int32_t dt) {
 }
 
 //////////////////////////////////////////////////////////
+// accelerometer
+// I2C addresses: 0x1C 0x1D 0x1E 0x1F 0x20 0x21
+
+//////////////////////////////////////////////////////////
 // thermometer
-//
+// I2C address: 0x5A
 #include <Wire.h>
 #include <SparkFunMLX90614.h>
 IRTherm thermometer;
@@ -268,7 +272,7 @@ void microphone_print() {
 
 //////////////////////////////////////////////////////////
 // spectrometer
-//
+// I2C address: 0x39
 #include <Adafruit_AS7341.h>
 Adafruit_AS7341 spectrometer;
 
