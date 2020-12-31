@@ -8912,12 +8912,15 @@ Source: AVX .. aphvc.pdf</description>
 <part name="BBTN" library="testpad" library_urn="urn:adsk.eagle:library:385" deviceset="TP" device="TP14R" package3d_urn="urn:adsk.eagle:package:27966/1"/>
 <part name="ENCR" library="testpad" library_urn="urn:adsk.eagle:library:385" deviceset="TP" device="TP14R" package3d_urn="urn:adsk.eagle:package:27966/1"/>
 <part name="ENCL" library="testpad" library_urn="urn:adsk.eagle:library:385" deviceset="TP" device="TP14R" package3d_urn="urn:adsk.eagle:package:27966/1"/>
+<part name="R11" library="resistor" library_urn="urn:adsk.eagle:library:348" deviceset="R-EU_" device="R0805" package3d_urn="urn:adsk.eagle:package:23553/2"/>
+<part name="R12" library="resistor" library_urn="urn:adsk.eagle:library:348" deviceset="R-EU_" device="R0805" package3d_urn="urn:adsk.eagle:package:23553/2"/>
 </parts>
 <sheets>
 <sheet>
 <plain>
 <text x="-48.26" y="83.82" size="1.778" layer="91">Teensy 4</text>
 <text x="20.32" y="83.82" size="1.778" layer="91">Teensy 3.2</text>
+<text x="-40.64" y="25.4" size="1.778" layer="91">Optional I2C pullups</text>
 </plain>
 <instances>
 <instance part="R5" gate="G$1" x="-149.86" y="40.64" smashed="yes">
@@ -9015,6 +9018,14 @@ Source: AVX .. aphvc.pdf</description>
 <attribute name="NAME" x="-138.43" y="36.83" size="1.778" layer="95" rot="R180"/>
 <attribute name="TP_SIGNAL_NAME" x="-140.97" y="39.37" size="1.778" layer="97" rot="R180"/>
 </instance>
+<instance part="R11" gate="G$1" x="-33.02" y="17.78" smashed="yes" rot="R90">
+<attribute name="NAME" x="-34.5186" y="13.97" size="1.778" layer="95" rot="R90"/>
+<attribute name="VALUE" x="-29.718" y="13.97" size="1.778" layer="96" rot="R90"/>
+</instance>
+<instance part="R12" gate="G$1" x="-25.4" y="17.78" smashed="yes" rot="R90">
+<attribute name="NAME" x="-26.8986" y="13.97" size="1.778" layer="95" rot="R90"/>
+<attribute name="VALUE" x="-22.098" y="13.97" size="1.778" layer="96" rot="R90"/>
+</instance>
 </instances>
 <busses>
 </busses>
@@ -9109,6 +9120,14 @@ Source: AVX .. aphvc.pdf</description>
 <pinref part="R1" gate="G$1" pin="2"/>
 <wire x1="-144.78" y1="12.7" x2="-149.86" y2="12.7" width="0.1524" layer="91"/>
 <label x="-149.86" y="12.7" size="1.778" layer="95"/>
+</segment>
+<segment>
+<pinref part="R11" gate="G$1" pin="2"/>
+<wire x1="-33.02" y1="22.86" x2="-40.64" y2="22.86" width="0.1524" layer="91"/>
+<pinref part="R12" gate="G$1" pin="2"/>
+<wire x1="-33.02" y1="22.86" x2="-25.4" y2="22.86" width="0.1524" layer="91"/>
+<junction x="-33.02" y="22.86"/>
+<label x="-40.64" y="22.86" size="1.778" layer="95"/>
 </segment>
 </net>
 <net name="ENCL" class="0">
@@ -9431,6 +9450,11 @@ Source: AVX .. aphvc.pdf</description>
 <wire x1="-180.34" y1="-12.7" x2="-175.26" y2="-12.7" width="0.1524" layer="91"/>
 <label x="-175.26" y="-12.7" size="1.778" layer="95"/>
 </segment>
+<segment>
+<pinref part="R12" gate="G$1" pin="1"/>
+<wire x1="-25.4" y1="12.7" x2="-17.78" y2="12.7" width="0.1524" layer="91"/>
+<label x="-17.78" y="12.7" size="1.778" layer="95"/>
+</segment>
 </net>
 <net name="SCL" class="0">
 <segment>
@@ -9442,6 +9466,11 @@ Source: AVX .. aphvc.pdf</description>
 <pinref part="U$3" gate="G$1" pin="12"/>
 <wire x1="-180.34" y1="-15.24" x2="-175.26" y2="-15.24" width="0.1524" layer="91"/>
 <label x="-175.26" y="-15.24" size="1.778" layer="95"/>
+</segment>
+<segment>
+<pinref part="R11" gate="G$1" pin="1"/>
+<wire x1="-33.02" y1="12.7" x2="-40.64" y2="12.7" width="0.1524" layer="91"/>
+<label x="-45.72" y="12.7" size="1.778" layer="95"/>
 </segment>
 </net>
 <net name="PBTN" class="0">

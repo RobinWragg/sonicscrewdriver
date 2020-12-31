@@ -73,7 +73,7 @@ void writeNorm(int pin, float input) {
 #include <Adafruit_GFX.h>
 #include <Adafruit_ST7789.h>
 #include <SPI.h>
-#include <Fonts/FreeMonoBold12pt7b.h>
+#include <Fonts/FreeMonoBold12pt7b.h> // rwtodo: will be unnecessary after custom renderer is implemented.
 #define TFT_RST (7)
 #define TFT_DC (9)
 #define TFT_CS (10)
@@ -119,6 +119,26 @@ void tft_test(int32_t tt, int32_t dt) {
 	
 	int end = millis();
 	timing_result = end - start;
+}
+
+//////////////////////////////////////////////////////////
+// renderer
+//
+typedef uint16_t Color;
+
+Color render_bg_color = ST77XX_BLACK; // rwtodo: this could become increasingly red as the battery level decreases.
+Color pixels[TFT_WIDTH][TFT_HEIGHT]; // Colours are 16-bit ints.
+
+void render_clear() {
+	memset(pixels, render_bg_color, sizeof(pixels) * TFT_WIDTH * TFT_HEIGHT);
+}
+
+void render_text(char *text, Color color, int x, int y) {
+	
+}
+
+void render_to_hardware() {
+	
 }
 
 //////////////////////////////////////////////////////////
