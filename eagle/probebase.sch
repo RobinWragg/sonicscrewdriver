@@ -208,12 +208,12 @@
 <smd name="14" x="2.75" y="0" dx="1.5" dy="0.3" layer="1" rot="R90"/>
 <smd name="15" x="3.25" y="0" dx="1.5" dy="0.3" layer="1" rot="R90"/>
 <smd name="16" x="3.75" y="0" dx="1.5" dy="0.3" layer="1" rot="R90"/>
-<smd name="BASE2" x="5.5" y="2.75" dx="2" dy="1.5" layer="1"/>
-<smd name="BASE1" x="-5.5" y="2.75" dx="2" dy="1.5" layer="1"/>
+<smd name="BASE2" x="6" y="2.75" dx="3" dy="1.5" layer="1"/>
+<smd name="BASE1" x="-6" y="2.75" dx="3" dy="1.5" layer="1"/>
 <wire x1="-6.35" y1="0" x2="6.35" y2="0" width="0.127" layer="21"/>
-<wire x1="6.35" y1="0" x2="6.35" y2="6.35" width="0.127" layer="21"/>
-<wire x1="6.35" y1="6.35" x2="-6.35" y2="6.35" width="0.127" layer="21"/>
-<wire x1="-6.35" y1="6.35" x2="-6.35" y2="0" width="0.127" layer="21"/>
+<wire x1="6.35" y1="0" x2="6.35" y2="10.16" width="0.127" layer="21"/>
+<wire x1="6.35" y1="10.16" x2="-6.35" y2="10.16" width="0.127" layer="21"/>
+<wire x1="-6.35" y1="10.16" x2="-6.35" y2="0" width="0.127" layer="21"/>
 </package>
 </packages>
 <symbols>
