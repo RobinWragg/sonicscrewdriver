@@ -1854,7 +1854,7 @@ new: Attribute TP_SIGNAL_NAME&lt;br&gt;
 <class number="0" name="default" width="0.1524" drill="0">
 <clearance class="0" value="0.1524"/>
 </class>
-<class number="1" name="battery" width="0.3048" drill="0">
+<class number="1" name="battery" width="0.254" drill="0">
 <clearance class="1" value="0.1524"/>
 </class>
 </classes>
@@ -1872,9 +1872,10 @@ new: Attribute TP_SIGNAL_NAME&lt;br&gt;
 <part name="SDA" library="testpad" library_urn="urn:adsk.eagle:library:385" deviceset="TP" device="TP14R" package3d_urn="urn:adsk.eagle:package:27966/1"/>
 <part name="SCL" library="testpad" library_urn="urn:adsk.eagle:library:385" deviceset="TP" device="TP14R" package3d_urn="urn:adsk.eagle:package:27966/1"/>
 <part name="3V" library="testpad" library_urn="urn:adsk.eagle:library:385" deviceset="TP" device="TP14R" package3d_urn="urn:adsk.eagle:package:27966/1"/>
-<part name="GND" library="testpad" library_urn="urn:adsk.eagle:library:385" deviceset="TP" device="TP14R" package3d_urn="urn:adsk.eagle:package:27966/1"/>
+<part name="BTN" library="testpad" library_urn="urn:adsk.eagle:library:385" deviceset="TP" device="TP14R" package3d_urn="urn:adsk.eagle:package:27966/1"/>
 <part name="LRCL" library="testpad" library_urn="urn:adsk.eagle:library:385" deviceset="TP" device="TP14R" package3d_urn="urn:adsk.eagle:package:27966/1"/>
 <part name="BCLK" library="testpad" library_urn="urn:adsk.eagle:library:385" deviceset="TP" device="TP14R" package3d_urn="urn:adsk.eagle:package:27966/1"/>
+<part name="GND" library="testpad" library_urn="urn:adsk.eagle:library:385" deviceset="TP" device="TP14R" package3d_urn="urn:adsk.eagle:package:27966/1"/>
 </parts>
 <sheets>
 <sheet>
@@ -1927,7 +1928,7 @@ new: Attribute TP_SIGNAL_NAME&lt;br&gt;
 <attribute name="NAME" x="41.91" y="11.43" size="1.778" layer="95"/>
 <attribute name="TP_SIGNAL_NAME" x="39.37" y="11.43" size="1.778" layer="97" rot="R270"/>
 </instance>
-<instance part="GND" gate="G$1" x="40.64" y="10.16" smashed="yes" rot="R270">
+<instance part="BTN" gate="G$1" x="40.64" y="10.16" smashed="yes" rot="R270">
 <attribute name="NAME" x="41.91" y="8.89" size="1.778" layer="95"/>
 <attribute name="TP_SIGNAL_NAME" x="39.37" y="8.89" size="1.778" layer="97" rot="R270"/>
 </instance>
@@ -1939,11 +1940,15 @@ new: Attribute TP_SIGNAL_NAME&lt;br&gt;
 <attribute name="NAME" x="41.91" y="13.97" size="1.778" layer="95"/>
 <attribute name="TP_SIGNAL_NAME" x="39.37" y="13.97" size="1.778" layer="97" rot="R270"/>
 </instance>
+<instance part="GND" gate="G$1" x="63.5" y="45.72" smashed="yes" rot="R270">
+<attribute name="NAME" x="64.77" y="44.45" size="1.778" layer="95"/>
+<attribute name="TP_SIGNAL_NAME" x="62.23" y="44.45" size="1.778" layer="97" rot="R270"/>
+</instance>
 </instances>
 <busses>
 </busses>
 <nets>
-<net name="3V" class="0">
+<net name="3V" class="1">
 <segment>
 <pinref part="R13" gate="G$1" pin="2"/>
 <wire x1="5.08" y1="78.74" x2="5.08" y2="81.28" width="0.1524" layer="91"/>
@@ -1971,7 +1976,7 @@ new: Attribute TP_SIGNAL_NAME&lt;br&gt;
 <label x="25.4" y="12.7" size="1.778" layer="95"/>
 </segment>
 </net>
-<net name="GND" class="0">
+<net name="GND" class="1">
 <segment>
 <pinref part="R14" gate="G$1" pin="1"/>
 <wire x1="22.86" y1="81.28" x2="15.24" y2="81.28" width="0.1524" layer="91"/>
@@ -1993,10 +1998,9 @@ new: Attribute TP_SIGNAL_NAME&lt;br&gt;
 <label x="25.4" y="5.08" size="1.778" layer="95"/>
 </segment>
 <segment>
-<pinref part="U$3" gate="G$1" pin="16"/>
 <pinref part="GND" gate="G$1" pin="TP"/>
-<wire x1="20.32" y1="10.16" x2="38.1" y2="10.16" width="0.1524" layer="91"/>
-<label x="25.4" y="10.16" size="1.778" layer="95"/>
+<wire x1="60.96" y1="45.72" x2="53.34" y2="45.72" width="0.1524" layer="91"/>
+<label x="53.34" y="45.72" size="1.778" layer="95"/>
 </segment>
 </net>
 <net name="TFTCS" class="0">
@@ -2145,6 +2149,14 @@ new: Attribute TP_SIGNAL_NAME&lt;br&gt;
 <wire x1="20.32" y1="15.24" x2="38.1" y2="15.24" width="0.1524" layer="91"/>
 <pinref part="BCLK" gate="G$1" pin="TP"/>
 <label x="25.4" y="15.24" size="1.778" layer="95"/>
+</segment>
+</net>
+<net name="BTN" class="0">
+<segment>
+<pinref part="U$3" gate="G$1" pin="16"/>
+<pinref part="BTN" gate="G$1" pin="TP"/>
+<wire x1="20.32" y1="10.16" x2="38.1" y2="10.16" width="0.1524" layer="91"/>
+<label x="25.4" y="10.16" size="1.778" layer="95"/>
 </segment>
 </net>
 </nets>
