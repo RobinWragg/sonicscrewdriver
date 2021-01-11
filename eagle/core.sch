@@ -8914,6 +8914,7 @@ Source: AVX .. aphvc.pdf</description>
 <part name="ENCL" library="testpad" library_urn="urn:adsk.eagle:library:385" deviceset="TP" device="TP14R" package3d_urn="urn:adsk.eagle:package:27966/1"/>
 <part name="R11" library="resistor" library_urn="urn:adsk.eagle:library:348" deviceset="R-EU_" device="R0805" package3d_urn="urn:adsk.eagle:package:23553/2"/>
 <part name="R12" library="resistor" library_urn="urn:adsk.eagle:library:348" deviceset="R-EU_" device="R0805" package3d_urn="urn:adsk.eagle:package:23553/2"/>
+<part name="C3" library="resistor" library_urn="urn:adsk.eagle:library:348" deviceset="C-EU" device="C0805" package3d_urn="urn:adsk.eagle:package:23617/2" value="0.1u"/>
 </parts>
 <sheets>
 <sheet>
@@ -9026,6 +9027,10 @@ Source: AVX .. aphvc.pdf</description>
 <attribute name="NAME" x="-26.8986" y="13.97" size="1.778" layer="95" rot="R90"/>
 <attribute name="VALUE" x="-22.098" y="13.97" size="1.778" layer="96" rot="R90"/>
 </instance>
+<instance part="C3" gate="G$1" x="20.32" y="30.48" smashed="yes">
+<attribute name="NAME" x="21.844" y="30.861" size="1.778" layer="95"/>
+<attribute name="VALUE" x="21.844" y="25.781" size="1.778" layer="96"/>
+</instance>
 </instances>
 <busses>
 </busses>
@@ -9081,6 +9086,11 @@ Source: AVX .. aphvc.pdf</description>
 <wire x1="-144.78" y1="-27.94" x2="-139.7" y2="-27.94" width="0.1524" layer="91"/>
 <label x="-139.7" y="-27.94" size="1.778" layer="95"/>
 </segment>
+<segment>
+<pinref part="C3" gate="G$1" pin="2"/>
+<wire x1="20.32" y1="25.4" x2="25.4" y2="25.4" width="0.1524" layer="91"/>
+<label x="25.4" y="22.86" size="1.778" layer="95"/>
+</segment>
 </net>
 <net name="3V" class="1">
 <segment>
@@ -9128,6 +9138,11 @@ Source: AVX .. aphvc.pdf</description>
 <wire x1="-33.02" y1="22.86" x2="-25.4" y2="22.86" width="0.1524" layer="91"/>
 <junction x="-33.02" y="22.86"/>
 <label x="-40.64" y="22.86" size="1.778" layer="95"/>
+</segment>
+<segment>
+<wire x1="20.32" y1="33.02" x2="15.24" y2="33.02" width="0.1524" layer="91"/>
+<pinref part="C3" gate="G$1" pin="1"/>
+<label x="12.7" y="33.02" size="1.778" layer="95"/>
 </segment>
 </net>
 <net name="ENCL" class="0">
