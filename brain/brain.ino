@@ -2,11 +2,8 @@
 /*
 Next Steps
 ----------
-test infrared and see if you can get PWM working after power cycling.
-add resistor to the thermometer on the new probe pcb.
-Try making touch-buttons with the 3M bolts and a darlington pair. Remember to ground yourself.
+Try making touch-buttons with the 3M bolts. Remember to ground yourself.
 Try making a voltage divider with the 20M SMD resistors for the antenna.
-Try reducing the number of wires from the microphone. Learn what each one does before commiting to removing any.
 Try out the conductive paint.
 Practice chamfering.
 buy an adafruit micro-lipo usb c module when you know which pressure sensor to get.
@@ -160,7 +157,7 @@ uint16_t render_bg_color = ST77XX_BLACK; // rwtodo: this could become increasing
 uint16_t pixels[TFT_WIDTH*TFT_HEIGHT]; // Colours are 16-bit ints.
 
 void render_clear() {
-	memset(pixels, render_bg_color, sizeof(pixels) * TFT_WIDTH * TFT_HEIGHT);
+	memset(pixels, render_bg_color, sizeof(pixels[0]) * TFT_WIDTH * TFT_HEIGHT);
 }
 
 void render_pixel(uint16_t color, int x, int y) {

@@ -8921,7 +8921,7 @@ Source: AVX .. aphvc.pdf</description>
 <plain>
 <text x="-48.26" y="83.82" size="1.778" layer="91">Teensy 4</text>
 <text x="20.32" y="83.82" size="1.778" layer="91">Teensy 3.2</text>
-<text x="-40.64" y="25.4" size="1.778" layer="91">Optional I2C pullups</text>
+<text x="-40.64" y="25.4" size="1.778" layer="91">I2C pullups</text>
 </plain>
 <instances>
 <instance part="R5" gate="G$1" x="-149.86" y="40.64" smashed="yes">
