@@ -74,6 +74,7 @@ void writeNorm(int pin, float input) {
 #define TFT_RST (7)
 #define TFT_DC (9)
 #define TFT_CS (10)
+#define TFT_MOSI (11)
 #define TFT_WIDTH (135)
 #define TFT_HEIGHT (240)
 Adafruit_ST7789 tft = Adafruit_ST7789(TFT_CS, TFT_DC, TFT_RST);
