@@ -448,13 +448,11 @@ void loop() {
 	thermometer_print();
 	spectrometer_print();
 	
+	tft.fillScreen(ST77XX_BLACK);
+	tft.setCursor(30, 70);
+	tft.print("omg");
+	
 	delay(300);
-	tft.fillScreen(render_bg_color);
-	render_clear();
-	render_text("hello!", ST77XX_YELLOW, 20, 20);
-	render_to_hardware();
-	delay(100);
-	tft.fillScreen(ST77XX_GREEN);
 	
 	prev_tt = tt;
 }
