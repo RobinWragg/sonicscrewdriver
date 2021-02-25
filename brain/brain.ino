@@ -3,9 +3,6 @@
 Next Steps
 ----------
 Try making touch-buttons with the 3M bolts. Remember to ground yourself.
-Try making a voltage divider with the 20M SMD resistors for the antenna.
-Try out the conductive paint.
-Practice chamfering.
 buy an adafruit micro-lipo usb c module when you know which pressure sensor to get.
 */
 
@@ -20,7 +17,7 @@ laser
 spectrometer
 thermometer
 pressure, air quality etc?
-microphone
+
 torch, white
 torch, uv
 accent lights
@@ -41,6 +38,7 @@ double electromagnetism antenna
 #define UV_PWM_PIN (2)
 #define TORCH_PWM_PIN (3)
 #define LASER_PWM_PIN (4)
+#define ACCENT_PWM_PIN (5)
 #define ANTENNA_PIN (14)
 #define UNAVAILABLE_PIN (23)
 
@@ -81,6 +79,7 @@ Adafruit_ST7789 tft = Adafruit_ST7789(TFT_CS, TFT_DC, TFT_RST);
 
 void tft_init() {
 	tft.init(TFT_WIDTH, TFT_HEIGHT); // rwtodo: this takes a long time, 500ms or so.
+	tft.fillScreen(ST77XX_BLACK);
 	tft.setFont(&FreeMonoBold12pt7b);
 	tft.setTextColor(ST77XX_WHITE);
 }
@@ -365,11 +364,23 @@ void spectrometer_init() {
 	}
 
 	spectrometer.setATIME(100); // rwtodo: don't know what these mean
-	spectrometer.setASTEP(999); // rwtodo: don't know what these mean
+	spectrometer.setASTEP(999); // rwtodo: don't know what these mean https://adafruit.github.io/Adafruit_AS7341/html/class_adafruit___a_s7341.html#a82798183157357664568a6915d281e5f
 	spectrometer.setGain(AS7341_GAIN_256X); // rwtodo: don't know what these mean
 }
 
 void spectrometer_print() {
+	/*
+	415nm = 7600ed
+	445nm = 0028ff
+	480nm = 00d5ff
+	515nm = 1fff00
+	555nm = b3ff00
+	590nm = ffdf00
+	630nm = ff4f00
+	680nm = ff0000
+	Near IR/~700nm to ~800 = cc0000
+	*/
+	
 	if (spectrometer.readAllChannels()) {
 		Serial.print("F1,415nm:"); Serial.print(spectrometer.getChannel(AS7341_CHANNEL_415nm_F1));
 		Serial.print(" F2,445nm:"); Serial.print(spectrometer.getChannel(AS7341_CHANNEL_445nm_F2));
@@ -379,8 +390,10 @@ void spectrometer_print() {
 		Serial.print(" F6,590nm:"); Serial.print(spectrometer.getChannel(AS7341_CHANNEL_590nm_F6));
 		Serial.print(" F7,630nm:"); Serial.print(spectrometer.getChannel(AS7341_CHANNEL_630nm_F7));
 		Serial.print(" F8,680nm:"); Serial.print(spectrometer.getChannel(AS7341_CHANNEL_680nm_F8));
-		Serial.print(" Clear:"); Serial.print(spectrometer.getChannel(AS7341_CHANNEL_CLEAR));
-		Serial.print(" Near IR:"); Serial.print(spectrometer.getChannel(AS7341_CHANNEL_NIR));
+		Serial.print(" White:"); Serial.print(spectrometer.getChannel(AS7341_CHANNEL_CLEAR));
+		Serial.print(" Near IR:"); Serial.print(spectrometer.getChannel(AS7341_CHANNEL_NIR)); // 700nm?
+		
+		float freq = spectrometer.detectFlickerHz();
 
 		Serial.println();
 	} else {
@@ -448,11 +461,57 @@ void loop() {
 	thermometer_print();
 	spectrometer_print();
 	
+	Serial.println("Flashing lights");
+	
+	// Flash UV once
+	writeNorm(UV_PWM_PIN, 1.0f);
+	delay(100);
+	writeNorm(UV_PWM_PIN, 0.0f);
+	
+	// Flash torch twice
+	writeNorm(TORCH_PWM_PIN, 1.0f);
+	delay(100);
+	writeNorm(TORCH_PWM_PIN, 0.0f);
+	delay(200);
+	writeNorm(TORCH_PWM_PIN, 1.0f);
+	delay(100);
+	writeNorm(TORCH_PWM_PIN, 0.0f);
+	
+	// Flash laser thrice
+	writeNorm(LASER_PWM_PIN, 1.0f);
+	delay(100);
+	writeNorm(LASER_PWM_PIN, 0.0f);
+	delay(200);
+	writeNorm(LASER_PWM_PIN, 1.0f);
+	delay(100);
+	writeNorm(LASER_PWM_PIN, 0.0f);
+	delay(200);
+	writeNorm(LASER_PWM_PIN, 1.0f);
+	delay(100);
+	writeNorm(LASER_PWM_PIN, 0.0f);
+	
+	// Flash accent four times
+	writeNorm(ACCENT_PWM_PIN, 1.0f);
+	delay(100);
+	writeNorm(ACCENT_PWM_PIN, 0.0f);
+	delay(200);
+	writeNorm(ACCENT_PWM_PIN, 1.0f);
+	delay(100);
+	writeNorm(ACCENT_PWM_PIN, 0.0f);
+	delay(200);
+	writeNorm(ACCENT_PWM_PIN, 1.0f);
+	delay(100);
+	writeNorm(ACCENT_PWM_PIN, 0.0f);
+	delay(200);
+	writeNorm(ACCENT_PWM_PIN, 1.0f);
+	delay(100);
+	writeNorm(ACCENT_PWM_PIN, 0.0f);
+	
+	Serial.println("Writing to tft");
+	
 	tft.fillScreen(ST77XX_BLACK);
 	tft.setCursor(30, 70);
 	tft.print("omg");
-	
-	delay(300);
 	
 	prev_tt = tt;
 }
