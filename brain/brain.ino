@@ -59,6 +59,7 @@ float readNorm(int pin) {
 }
 
 void writeNorm(int pin, float input) {
+	// rwtodo: clamp input to 0-1
 	analogWrite(pin, input * DAC_MAX_VALUE);
 }
 
@@ -273,7 +274,7 @@ void thermometer_print() {
 		Serial.print("THERM object:"); Serial.print(thermometer.object());
 		Serial.print(" ambient:"); Serial.print(thermometer.ambient());
 		Serial.println(" C");
-	}
+	} else Serial.println("NO THERM");
 }
 
 //////////////////////////////////////////////////////////
@@ -464,48 +465,48 @@ void loop() {
 	Serial.println("Flashing lights");
 	
 	// Flash UV once
-	writeNorm(UV_PWM_PIN, 1.0f);
-	delay(100);
 	writeNorm(UV_PWM_PIN, 0.0f);
+	delay(100);
+	writeNorm(UV_PWM_PIN, 1.0f);
 	
 	// Flash torch twice
-	writeNorm(TORCH_PWM_PIN, 1.0f);
-	delay(100);
 	writeNorm(TORCH_PWM_PIN, 0.0f);
+	delay(100);
+	writeNorm(TORCH_PWM_PIN, 1.0f);
 	delay(200);
-	writeNorm(TORCH_PWM_PIN, 1.0f);
-	delay(100);
 	writeNorm(TORCH_PWM_PIN, 0.0f);
+	delay(100);
+	writeNorm(TORCH_PWM_PIN, 1.0f);
 	
 	// Flash laser thrice
-	writeNorm(LASER_PWM_PIN, 1.0f);
-	delay(100);
 	writeNorm(LASER_PWM_PIN, 0.0f);
+	delay(100);
+	writeNorm(LASER_PWM_PIN, 1.0f);
 	delay(200);
-	writeNorm(LASER_PWM_PIN, 1.0f);
-	delay(100);
 	writeNorm(LASER_PWM_PIN, 0.0f);
+	delay(100);
+	writeNorm(LASER_PWM_PIN, 1.0f);
 	delay(200);
-	writeNorm(LASER_PWM_PIN, 1.0f);
-	delay(100);
 	writeNorm(LASER_PWM_PIN, 0.0f);
+	delay(100);
+	writeNorm(LASER_PWM_PIN, 1.0f);
 	
 	// Flash accent four times
-	writeNorm(ACCENT_PWM_PIN, 1.0f);
-	delay(100);
 	writeNorm(ACCENT_PWM_PIN, 0.0f);
+	delay(100);
+	writeNorm(ACCENT_PWM_PIN, 1.0f);
 	delay(200);
-	writeNorm(ACCENT_PWM_PIN, 1.0f);
-	delay(100);
 	writeNorm(ACCENT_PWM_PIN, 0.0f);
+	delay(100);
+	writeNorm(ACCENT_PWM_PIN, 1.0f);
 	delay(200);
-	writeNorm(ACCENT_PWM_PIN, 1.0f);
-	delay(100);
 	writeNorm(ACCENT_PWM_PIN, 0.0f);
+	delay(100);
+	writeNorm(ACCENT_PWM_PIN, 1.0f);
 	delay(200);
-	writeNorm(ACCENT_PWM_PIN, 1.0f);
-	delay(100);
 	writeNorm(ACCENT_PWM_PIN, 0.0f);
+	delay(100);
+	writeNorm(ACCENT_PWM_PIN, 1.0f);
 	
 	Serial.println("Writing to tft");
 	
