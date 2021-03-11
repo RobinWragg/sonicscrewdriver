@@ -30,16 +30,33 @@ double electromagnetism antenna
 // put a 100k resistor between the amp's GAIN pin and 3.3v, instead of the blue wire, for minimum gain, as the amp has high current draw.
 // after teensy3.2's final RAM requirements are known, generate a new raw file that is as slow as possible. 0.3 speed?
 // GPS: https://www.adafruit.com/product/790
-// optimise audio-out sample rate
+// Manage the capacitance of the i2c bus https://www.silabs.com/community/mcu/8-bit/knowledge-base.entry.html/2017/06/09/i2c_pull-up_resistor-rJbx
 
 //////////////////////////////////////////////////////////
 // pins
 //
+#define RX_PIN (0)
+#define TX_PIN (1)
 #define UV_PWM_PIN (2)
 #define TORCH_PWM_PIN (3)
 #define LASER_PWM_PIN (4)
 #define ACCENT_PWM_PIN (5)
-#define ANTENNA_PIN (14)
+// 6
+#define TFT_RST_PIN (7)
+#define DOUT_PIN (8)
+#define TFT_DC_PIN (9)
+#define TFT_CS_PIN (10)
+#define TFT_MOSI_PIN (11)
+// 12
+#define TFT_SCK_PIN (13)
+// 14
+#define BBTN_PIN (15)
+#define PBTN_PIN (16)
+#define VOLTREAD_PIN (17)
+#define SDA_PIN (18)
+#define SCL_PIN (19)
+#define BCLK_PIN (20)
+#define ANTENNA_PIN (22)
 #define UNAVAILABLE_PIN (23)
 
 //////////////////////////////////////////////////////////
@@ -70,13 +87,9 @@ void writeNorm(int pin, float input) {
 #include <Adafruit_ST7789.h>
 #include <SPI.h>
 #include <Fonts/FreeMonoBold12pt7b.h> // rwtodo: will be unnecessary after custom renderer is implemented.
-#define TFT_RST (7)
-#define TFT_DC (9)
-#define TFT_CS (10)
-#define TFT_MOSI (11)
 #define TFT_WIDTH (135)
 #define TFT_HEIGHT (240)
-Adafruit_ST7789 tft = Adafruit_ST7789(TFT_CS, TFT_DC, TFT_RST);
+Adafruit_ST7789 tft = Adafruit_ST7789(TFT_CS_PIN, TFT_DC_PIN, TFT_RST_PIN);
 
 void tft_init() {
 	tft.init(TFT_WIDTH, TFT_HEIGHT); // rwtodo: this takes a long time, 500ms or so.
@@ -260,7 +273,59 @@ void feedback_test(int32_t tt, int32_t dt) {
 
 //////////////////////////////////////////////////////////
 // accelerometer
-// I2C addresses: 0x1C 0x1D 0x1E 0x1F 0x20 0x21
+// I2C address:
+
+//////////////////////////////////////////////////////////
+// humidity sensor
+// I2C address: 0xB8
+
+//////////////////////////////////////////////////////////
+// altimeter
+// I2C address: 0x77
+#include <Adafruit_Sensor.h>
+#include "Adafruit_BMP3XX.h"
+Adafruit_BMP3XX altimeter;
+#define SEALEVELPRESSURE_HPA (1013.25)
+
+// rwtodo: confirm that initialising the sensor before every read does not affect the accuracy of the readings.
+void altimeter_get(float *pascals, float *meters) {
+	// Initialise every time. Seems to drastically improve reliability.
+	if (altimeter.begin_I2C()) {
+    // Set up oversampling and filter initialization
+    altimeter.setTemperatureOversampling(BMP3_OVERSAMPLING_8X); // BMP3_NO_OVERSAMPLING to BMP3_OVERSAMPLING_32X rwtodo
+    altimeter.setPressureOversampling(BMP3_OVERSAMPLING_4X); // BMP3_NO_OVERSAMPLING to BMP3_OVERSAMPLING_32X rwtodo
+    altimeter.setIIRFilterCoeff(BMP3_IIR_FILTER_COEFF_3); // ? rwtodo
+    altimeter.setOutputDataRate(BMP3_ODR_50_HZ); // rwtodo
+    
+    if (altimeter.performReading()) {
+    	*pascals = altimeter.pressure;
+    	*meters = altimeter.readAltitude(SEALEVELPRESSURE_HPA);
+    	return;
+    }
+  }
+  
+  // If something went wrong, return 0.
+	*pascals = 0;
+	*meters = 0;
+}
+
+void altimeter_print() {
+	float pascals, meters;
+	altimeter_get(&pascals, &meters);
+	Serial.print("Pascals: "); Serial.print(pascals);
+	Serial.print(" Meters: "); Serial.println(meters);
+}
+
+//////////////////////////////////////////////////////////
+// magnetometer
+// I2C address: 0x1E
+//
+// gyroscope+accelerometer
+// I2C address: 0x6B
+
+//////////////////////////////////////////////////////////
+// GPS
+// I2C address: 0x10
 
 //////////////////////////////////////////////////////////
 // thermometer
@@ -356,17 +421,18 @@ void microphone_print() {
 //////////////////////////////////////////////////////////
 // spectrometer
 // I2C address: 0x39
+// rwtodo: remove spectrometer's i2c pullups. 10k is too low for the altimeter.
 #include <Adafruit_AS7341.h>
 Adafruit_AS7341 spectrometer;
 
 void spectrometer_init() {
-	if (!spectrometer.begin()){
-	  Serial.println("Could not find spectrometer");
+	if (spectrometer.begin()) {
+		spectrometer.setATIME(100); // rwtodo: don't know what these mean
+		spectrometer.setASTEP(999); // rwtodo: don't know what these mean https://adafruit.github.io/Adafruit_AS7341/html/class_adafruit___a_s7341.html#a82798183157357664568a6915d281e5f
+		spectrometer.setGain(AS7341_GAIN_256X); // rwtodo: don't know what these mean
+	} else {	
+	  Serial.println("COULD NOT FIND SPECTROMETER");
 	}
-
-	spectrometer.setATIME(100); // rwtodo: don't know what these mean
-	spectrometer.setASTEP(999); // rwtodo: don't know what these mean https://adafruit.github.io/Adafruit_AS7341/html/class_adafruit___a_s7341.html#a82798183157357664568a6915d281e5f
-	spectrometer.setGain(AS7341_GAIN_256X); // rwtodo: don't know what these mean
 }
 
 void spectrometer_print() {
@@ -460,59 +526,33 @@ void loop() {
 	Serial.println();
 	microphone_print();
 	thermometer_print();
-	spectrometer_print();
+	altimeter_print();
+	// spectrometer_print(); // This hangs the teensy if it fails.
 	
 	Serial.println("Flashing lights");
 	
-	// Flash UV once
+	writeNorm(LASER_PWM_PIN, 0.0f);
+	delay(100);
+	writeNorm(LASER_PWM_PIN, 1.0f);
 	writeNorm(UV_PWM_PIN, 0.0f);
 	delay(100);
 	writeNorm(UV_PWM_PIN, 1.0f);
-	
-	// Flash torch twice
 	writeNorm(TORCH_PWM_PIN, 0.0f);
 	delay(100);
 	writeNorm(TORCH_PWM_PIN, 1.0f);
-	delay(200);
-	writeNorm(TORCH_PWM_PIN, 0.0f);
-	delay(100);
-	writeNorm(TORCH_PWM_PIN, 1.0f);
-	
-	// Flash laser thrice
-	writeNorm(LASER_PWM_PIN, 0.0f);
-	delay(100);
-	writeNorm(LASER_PWM_PIN, 1.0f);
-	delay(200);
-	writeNorm(LASER_PWM_PIN, 0.0f);
-	delay(100);
-	writeNorm(LASER_PWM_PIN, 1.0f);
-	delay(200);
-	writeNorm(LASER_PWM_PIN, 0.0f);
-	delay(100);
-	writeNorm(LASER_PWM_PIN, 1.0f);
-	
-	// Flash accent four times
-	writeNorm(ACCENT_PWM_PIN, 0.0f);
-	delay(100);
-	writeNorm(ACCENT_PWM_PIN, 1.0f);
-	delay(200);
-	writeNorm(ACCENT_PWM_PIN, 0.0f);
-	delay(100);
-	writeNorm(ACCENT_PWM_PIN, 1.0f);
-	delay(200);
-	writeNorm(ACCENT_PWM_PIN, 0.0f);
-	delay(100);
-	writeNorm(ACCENT_PWM_PIN, 1.0f);
-	delay(200);
 	writeNorm(ACCENT_PWM_PIN, 0.0f);
 	delay(100);
 	writeNorm(ACCENT_PWM_PIN, 1.0f);
 	
 	Serial.println("Writing to tft");
+	tft.fillScreen(ST77XX_BLUE);
+	static int y = 10;
+	tft.setCursor(30, y);
+	y += 10;
+	if (y > TFT_HEIGHT) y = 10;
+	tft.print("Timey Wimey");
 	
-	tft.fillScreen(ST77XX_BLACK);
-	tft.setCursor(30, 70);
-	tft.print("omg");
+	delay(20);
 	
 	prev_tt = tt;
 }
