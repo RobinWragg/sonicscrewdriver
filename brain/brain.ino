@@ -68,16 +68,16 @@ int DAC_MAX_VALUE; // Defined in setup()
 int ADC_MAX_VALUE; // Defined in setup()
 
 float lerp(float a, float b, float t) {
-	return a + (b-a)*t;
+  return a + (b-a)*t;
 }
 
 float readNorm(int pin) {
-	return analogRead(pin) / (float)ADC_MAX_VALUE;
+  return analogRead(pin) / (float)ADC_MAX_VALUE;
 }
 
 void writeNorm(int pin, float input) {
-	// rwtodo: clamp input to 0-1
-	analogWrite(pin, input * DAC_MAX_VALUE);
+  // rwtodo: clamp input to 0-1
+  analogWrite(pin, input * DAC_MAX_VALUE);
 }
 
 //////////////////////////////////////////////////////////
@@ -92,43 +92,43 @@ void writeNorm(int pin, float input) {
 Adafruit_ST7789 tft = Adafruit_ST7789(TFT_CS_PIN, TFT_DC_PIN, TFT_RST_PIN);
 
 void tft_init() {
-	tft.init(TFT_WIDTH, TFT_HEIGHT); // rwtodo: this takes a long time, 500ms or so.
-	tft.fillScreen(ST77XX_BLACK);
-	tft.setFont(&FreeMonoBold12pt7b);
-	tft.setTextColor(ST77XX_WHITE);
+  tft.init(TFT_WIDTH, TFT_HEIGHT); // rwtodo: this takes a long time, 500ms or so.
+  tft.fillScreen(ST77XX_BLACK);
+  tft.setFont(&FreeMonoBold12pt7b);
+  tft.setTextColor(ST77XX_WHITE);
 }
 
 void tft_test(int32_t tt, int32_t dt) {
-	static int timing_result = 0;
-	
-	int start = millis();
-	
-	float one_second_loop_norm = (tt % 1000) / 1000.0f;
-	
-	int y = lerp(0, 1, one_second_loop_norm) * TFT_HEIGHT;
-	
-	if (y < 10) tft.fillScreen(ST77XX_BLACK);
-	tft.fillCircle(50, y, 40, ST77XX_GREEN);
-	
-	tft.setCursor(30, 70);
-	tft.print(timing_result);
-	tft.print("ms");
-	
-	// reference:
-	// tft.drawPixel(tft.width()/2, tft.height()/2, ST77XX_GREEN);
-	// tft.drawLine(10, 10, 100, 50, ST77XX_YELLOW);
-	// tft.setCursor(30, 70);
-	// tft.print("omg");
-	// tft.drawFastHLine(10, 10, 50, ST77XX_BLUE);
-	// tft.drawFastVLine(10, 10, 50, ST77XX_RED);
-	// tft.drawRect(10, 10, 20, 20, ST77XX_GREEN);
-	// tft.fillRect(20, 30, 40, 50, ST77XX_BLUE);
-	// tft.drawCircle(10, 10, 20, ST77XX_RED);
-	// tft.fillCircle(10, 10, 20, ST77XX_RED);
-	// tft.drawRoundRect(10, 10, 20, 30, 5, ST77XX_YELLOW);
-	
-	int end = millis();
-	timing_result = end - start;
+  static int timing_result = 0;
+  
+  int start = millis();
+  
+  float one_second_loop_norm = (tt % 1000) / 1000.0f;
+  
+  int y = lerp(0, 1, one_second_loop_norm) * TFT_HEIGHT;
+  
+  if (y < 10) tft.fillScreen(ST77XX_BLACK);
+  tft.fillCircle(50, y, 40, ST77XX_GREEN);
+  
+  tft.setCursor(30, 70);
+  tft.print(timing_result);
+  tft.print("ms");
+  
+  // reference:
+  // tft.drawPixel(tft.width()/2, tft.height()/2, ST77XX_GREEN);
+  // tft.drawLine(10, 10, 100, 50, ST77XX_YELLOW);
+  // tft.setCursor(30, 70);
+  // tft.print("omg");
+  // tft.drawFastHLine(10, 10, 50, ST77XX_BLUE);
+  // tft.drawFastVLine(10, 10, 50, ST77XX_RED);
+  // tft.drawRect(10, 10, 20, 20, ST77XX_GREEN);
+  // tft.fillRect(20, 30, 40, 50, ST77XX_BLUE);
+  // tft.drawCircle(10, 10, 20, ST77XX_RED);
+  // tft.fillCircle(10, 10, 20, ST77XX_RED);
+  // tft.drawRoundRect(10, 10, 20, 30, 5, ST77XX_YELLOW);
+  
+  int end = millis();
+  timing_result = end - start;
 }
 
 //////////////////////////////////////////////////////////
@@ -171,50 +171,50 @@ uint16_t render_bg_color = ST77XX_BLACK; // rwtodo: this could become increasing
 uint16_t pixels[TFT_WIDTH*TFT_HEIGHT]; // Colours are 16-bit ints.
 
 void render_clear() {
-	memset(pixels, render_bg_color, sizeof(pixels[0]) * TFT_WIDTH * TFT_HEIGHT);
+  memset(pixels, render_bg_color, sizeof(pixels[0]) * TFT_WIDTH * TFT_HEIGHT);
 }
 
 void render_pixel(uint16_t color, int x, int y) {
-	// rwtodo: could comment this out for efficiency.
-	if (x < 0 || x >= TFT_WIDTH || y < 0 || y >= TFT_HEIGHT) {
-		Serial.print("RENDERED PIXEL OUT OF BOUNDS: ");
-		Serial.print(x);
-		Serial.print(" ");
-		Serial.println(y);
-		return;
-	}
-	
-	pixels[x + y * TFT_HEIGHT] = color;
+  // rwtodo: could comment this out for efficiency.
+  if (x < 0 || x >= TFT_WIDTH || y < 0 || y >= TFT_HEIGHT) {
+    Serial.print("RENDERED PIXEL OUT OF BOUNDS: ");
+    Serial.print(x);
+    Serial.print(" ");
+    Serial.println(y);
+    return;
+  }
+  
+  pixels[x + y * TFT_HEIGHT] = color;
 }
 
 int render_character(char ch, uint16_t color, int x, int y) {
-	TextGlyph *glyph = &text_glyphs[ch];
-	
-	for (int pix_index = 0; pix_index < glyph->num_pixels; pix_index++) {
-		int total_x = x + text_pixel_coord_x(glyph->pixels[pix_index]);
-		int total_y = y + text_pixel_coord_y(glyph->pixels[pix_index]);
-		render_pixel(color, total_x, total_y);
-	}
-	
-	return glyph->kerning;
+  TextGlyph *glyph = &text_glyphs[ch];
+  
+  for (int pix_index = 0; pix_index < glyph->num_pixels; pix_index++) {
+    int total_x = x + text_pixel_coord_x(glyph->pixels[pix_index]);
+    int total_y = y + text_pixel_coord_y(glyph->pixels[pix_index]);
+    render_pixel(color, total_x, total_y);
+  }
+  
+  return glyph->kerning;
 }
 
 void render_text(const char *text, uint16_t color, int x, int y) {
-	for (int s = 0; s < strlen(text); s++) {
-		x += render_character(text[s], color, x, y);
-	}
+  for (int s = 0; s < strlen(text); s++) {
+    x += render_character(text[s], color, x, y);
+  }
 }
 
 void render_to_hardware() {
-	Serial.println("TODO");
-	for (int y = 0; y < TFT_HEIGHT; y++) {
-		tft.drawLine(0, y, TFT_WIDTH, y, render_bg_color);
-		
-		for (int x = 0; x < TFT_WIDTH; x++) {
-			uint16_t pixel_color = pixels[x + y * TFT_HEIGHT];
-			if (pixel_color != render_bg_color) tft.drawPixel(x, y, pixel_color);
-		}
-	}
+  Serial.println("TODO");
+  for (int y = 0; y < TFT_HEIGHT; y++) {
+    tft.drawLine(0, y, TFT_WIDTH, y, render_bg_color);
+    
+    for (int x = 0; x < TFT_WIDTH; x++) {
+      uint16_t pixel_color = pixels[x + y * TFT_HEIGHT];
+      if (pixel_color != render_bg_color) tft.drawPixel(x, y, pixel_color);
+    }
+  }
 }
 
 //////////////////////////////////////////////////////////
@@ -231,44 +231,44 @@ float feedback_intensity = 0.0f;
 float feedback_volume = 0.0f;
 
 void feedback_update(int32_t tt, int32_t dt) {
-	const int serial_buffer_size = 4;
-	uint8_t serial_buffer[serial_buffer_size] = {'p', 0, 'v', 0};
-	uint8_t &serial_pitch_byte = serial_buffer[1];
-	uint8_t &serial_volume_byte = serial_buffer[3];
-	
-	if (feedback_on) {
-		serial_pitch_byte = feedback_intensity * 255.0f;
-		if (serial_pitch_byte == 0) serial_pitch_byte = 1; // A pitch of 0 means no audio.
-		
-		float light_intensity = feedback_intensity * feedback_intensity;
-		
-		writeNorm(UV_PWM_PIN, light_intensity);
-		writeNorm(TORCH_PWM_PIN, light_intensity * 0.04f);
-	} else {
-		serial_pitch_byte = 0;
-		analogWrite(UV_PWM_PIN, 0);
-		analogWrite(TORCH_PWM_PIN, 0);
-	}
-	
-	// Send data to teensy3 over serial
-	serial_volume_byte = feedback_volume * 255 * 0.01; // rwtodo: remove the float here for proper volume control.
-	
-	static int32_t prev_serial_write_tt = 0;
-	
-	// teensy3 can read 1 byte per ~3ms, so 5ms per byte was chosen here to give ample room to prevent serial overflow.
-	if (tt - prev_serial_write_tt > serial_buffer_size * 5) {
-		Serial1.write(serial_buffer, serial_buffer_size);
-		prev_serial_write_tt = tt;
-	}	
+  const int serial_buffer_size = 4;
+  uint8_t serial_buffer[serial_buffer_size] = {'p', 0, 'v', 0};
+  uint8_t &serial_pitch_byte = serial_buffer[1];
+  uint8_t &serial_volume_byte = serial_buffer[3];
+  
+  if (feedback_on) {
+    serial_pitch_byte = feedback_intensity * 255.0f;
+    if (serial_pitch_byte == 0) serial_pitch_byte = 1; // A pitch of 0 means no audio.
+    
+    float light_intensity = feedback_intensity * feedback_intensity;
+    
+    writeNorm(UV_PWM_PIN, light_intensity);
+    writeNorm(TORCH_PWM_PIN, light_intensity * 0.04f);
+  } else {
+    serial_pitch_byte = 0;
+    analogWrite(UV_PWM_PIN, 0);
+    analogWrite(TORCH_PWM_PIN, 0);
+  }
+  
+  // Send data to teensy3 over serial
+  serial_volume_byte = feedback_volume * 255 * 0.1; // rwtodo: remove the float here for proper volume control.
+  
+  static int32_t prev_serial_write_tt = 0;
+  
+  // teensy3 can read 1 byte per ~3ms, so 5ms per byte was chosen here to give ample room to prevent serial overflow.
+  if (tt - prev_serial_write_tt > serial_buffer_size * 5) {
+    Serial1.write(serial_buffer, serial_buffer_size);
+    prev_serial_write_tt = tt;
+  } 
 }
 
 void feedback_test(int32_t tt, int32_t dt) {
-	float one_second_loop_norm = (tt % 1000) / 1000.0f;
-	float three_second_loop_norm = (tt % 3000) / 3000.0f;
-	
-	feedback_on = true;
-	feedback_volume = one_second_loop_norm;
-	feedback_intensity = three_second_loop_norm;
+  float one_second_loop_norm = (tt % 1000) / 1000.0f;
+  float three_second_loop_norm = (tt % 3000) / 3000.0f;
+  
+  feedback_on = true;
+  feedback_volume = one_second_loop_norm;
+  feedback_intensity = three_second_loop_norm;
 }
 
 //////////////////////////////////////////////////////////
@@ -287,33 +287,37 @@ void feedback_test(int32_t tt, int32_t dt) {
 Adafruit_BMP3XX altimeter;
 #define SEALEVELPRESSURE_HPA (1013.25)
 
+bool altimeter_needs_init = true;
+
 // rwtodo: confirm that initialising the sensor before every read does not affect the accuracy of the readings.
 void altimeter_get(float *pascals, float *meters) {
-	// Initialise every time. Seems to drastically improve reliability.
-	if (altimeter.begin_I2C()) {
+  if (altimeter_needs_init && altimeter.begin_I2C()) {
     // Set up oversampling and filter initialization
     altimeter.setTemperatureOversampling(BMP3_OVERSAMPLING_8X); // BMP3_NO_OVERSAMPLING to BMP3_OVERSAMPLING_32X rwtodo
     altimeter.setPressureOversampling(BMP3_OVERSAMPLING_4X); // BMP3_NO_OVERSAMPLING to BMP3_OVERSAMPLING_32X rwtodo
     altimeter.setIIRFilterCoeff(BMP3_IIR_FILTER_COEFF_3); // ? rwtodo
     altimeter.setOutputDataRate(BMP3_ODR_50_HZ); // rwtodo
     
-    if (altimeter.performReading()) {
-    	*pascals = altimeter.pressure;
-    	*meters = altimeter.readAltitude(SEALEVELPRESSURE_HPA);
-    	return;
-    }
+    altimeter_needs_init = false;
   }
   
-  // If something went wrong, return 0.
-	*pascals = 0;
-	*meters = 0;
+  if (altimeter.performReading()) {
+    *pascals = altimeter.pressure;
+    *meters = altimeter.readAltitude(SEALEVELPRESSURE_HPA);
+    return;
+  }
+  
+  // If something went wrong, return 0 (so I'm aware of the failure) and init the next time.
+  altimeter_needs_init = true;
+  *pascals = 0;
+  *meters = 0;
 }
 
 void altimeter_print() {
-	float pascals, meters;
-	altimeter_get(&pascals, &meters);
-	Serial.print("Pascals: "); Serial.print(pascals);
-	Serial.print(" Meters: "); Serial.println(meters);
+  float pascals, meters;
+  altimeter_get(&pascals, &meters);
+  Serial.print("Pascals: "); Serial.print(pascals);
+  Serial.print(" Meters: "); Serial.println(meters);
 }
 
 //////////////////////////////////////////////////////////
@@ -324,10 +328,6 @@ void altimeter_print() {
 // I2C address: 0x6B
 
 //////////////////////////////////////////////////////////
-// GPS
-// I2C address: 0x10
-
-//////////////////////////////////////////////////////////
 // thermometer
 // I2C address: 0x5A
 #include <Wire.h>
@@ -335,11 +335,11 @@ void altimeter_print() {
 IRTherm thermometer;
 
 void thermometer_print() {
-	if (thermometer.read()) {
-		Serial.print("THERM object:"); Serial.print(thermometer.object());
-		Serial.print(" ambient:"); Serial.print(thermometer.ambient());
-		Serial.println(" C");
-	} else Serial.println("NO THERM");
+  if (thermometer.read()) {
+    Serial.print("THERM object:"); Serial.print(thermometer.object());
+    Serial.print(" ambient:"); Serial.print(thermometer.ambient());
+    Serial.println(" C");
+  } else Serial.println("NO THERM");
 }
 
 //////////////////////////////////////////////////////////
@@ -348,59 +348,59 @@ void thermometer_print() {
 int antenna_sample_rate;
 
 void antenna_render_graph(int x, int y, int height) {
-	static int16_t samples[TFT_WIDTH] = {};
-	
-	if (x == 0) {
-		auto samples_start = micros();
-		for (int i = 0; i < TFT_WIDTH; i++) {
-			samples[i] = analogRead(ANTENNA_PIN);
-			delayMicroseconds(300);
-		}
-		auto samples_period_micros = micros() - samples_start;
-		float samples_period = samples_period_micros / 1000000.0f;
-		
-		if (samples_period <= 0.0f) samples_period = 0.00000001f;
-		antenna_sample_rate = TFT_WIDTH / samples_period;
-	}
-	
-	auto sample_color = ST77XX_GREEN;
-	
-	// clear vertical line
-	tft.drawLine(x, y, x, y + height, ST77XX_RED);
-	
-	
-	// signal
-	float sample_norm = samples[x] / (float)ADC_MAX_VALUE;
-	// float sample_norm = readNorm(ANTENNA_PIN);
-	
-	if (x == 0) {
-		tft.drawPixel(x, y + sample_norm * height, sample_color);
-	} else {
-		float prev_sample_norm = samples[x-1] / float(ADC_MAX_VALUE);
-		// tft.drawLine(x - 1, y + prev_sample_norm * height, x, y + sample_norm * height, sample_color);
-		tft.drawPixel(x, y + sample_norm * height, sample_color);
-	}
+  static int16_t samples[TFT_WIDTH] = {};
+  
+  if (x == 0) {
+    auto samples_start = micros();
+    for (int i = 0; i < TFT_WIDTH; i++) {
+      samples[i] = analogRead(ANTENNA_PIN);
+      delayMicroseconds(300);
+    }
+    auto samples_period_micros = micros() - samples_start;
+    float samples_period = samples_period_micros / 1000000.0f;
+    
+    if (samples_period <= 0.0f) samples_period = 0.00000001f;
+    antenna_sample_rate = TFT_WIDTH / samples_period;
+  }
+  
+  auto sample_color = ST77XX_GREEN;
+  
+  // clear vertical line
+  tft.drawLine(x, y, x, y + height, ST77XX_RED);
+  
+  
+  // signal
+  float sample_norm = samples[x] / (float)ADC_MAX_VALUE;
+  // float sample_norm = readNorm(ANTENNA_PIN);
+  
+  if (x == 0) {
+    tft.drawPixel(x, y + sample_norm * height, sample_color);
+  } else {
+    float prev_sample_norm = samples[x-1] / float(ADC_MAX_VALUE);
+    // tft.drawLine(x - 1, y + prev_sample_norm * height, x, y + sample_norm * height, sample_color);
+    tft.drawPixel(x, y + sample_norm * height, sample_color);
+  }
 }
 
 void antenna_render(int x) {
-	const int graph_height = 100;
-	const int text_line_height = 20;
-	
-	antenna_render_graph(x, 0, graph_height);
-	
-	if (x == 0) {
-		int y = graph_height + text_line_height;
-		
-		tft.fillRect(0, graph_height, TFT_WIDTH, TFT_HEIGHT - graph_height, ST77XX_BLUE);
-		tft.setCursor(0, y);
-		tft.print("<n>Hz");
-		
-		y += text_line_height;
-		
-		// tft.drawRect(0, y - text_line_height, TFT_WIDTH, text_line_height, ST77XX_BLUE);
-		tft.setCursor(0, y);
-		tft.print(antenna_sample_rate);
-	}
+  const int graph_height = 100;
+  const int text_line_height = 20;
+  
+  antenna_render_graph(x, 0, graph_height);
+  
+  if (x == 0) {
+    int y = graph_height + text_line_height;
+    
+    tft.fillRect(0, graph_height, TFT_WIDTH, TFT_HEIGHT - graph_height, ST77XX_BLUE);
+    tft.setCursor(0, y);
+    tft.print("<n>Hz");
+    
+    y += text_line_height;
+    
+    // tft.drawRect(0, y - text_line_height, TFT_WIDTH, text_line_height, ST77XX_BLUE);
+    tft.setCursor(0, y);
+    tft.print(antenna_sample_rate);
+  }
 }
 
 //////////////////////////////////////////////////////////
@@ -414,8 +414,8 @@ AudioConnection patchCord1(i2s, 0, fft, 0);
 AudioConnection patchCord2(i2s, 0, note_freq, 0);
 
 void microphone_print() {
-	Serial.print("MICROPH freq:"); Serial.print(note_freq.read());
-	Serial.print(" certainty:"); Serial.println(note_freq.probability());
+  Serial.print("MICROPH freq:"); Serial.print(note_freq.read());
+  Serial.print(" certainty:"); Serial.println(note_freq.probability());
 }
 
 //////////////////////////////////////////////////////////
@@ -426,84 +426,84 @@ void microphone_print() {
 Adafruit_AS7341 spectrometer;
 
 void spectrometer_init() {
-	if (spectrometer.begin()) {
-		spectrometer.setATIME(100); // rwtodo: don't know what these mean
-		spectrometer.setASTEP(999); // rwtodo: don't know what these mean https://adafruit.github.io/Adafruit_AS7341/html/class_adafruit___a_s7341.html#a82798183157357664568a6915d281e5f
-		spectrometer.setGain(AS7341_GAIN_256X); // rwtodo: don't know what these mean
-	} else {	
-	  Serial.println("COULD NOT FIND SPECTROMETER");
-	}
+  if (spectrometer.begin()) {
+    spectrometer.setATIME(100); // rwtodo: don't know what these mean
+    spectrometer.setASTEP(999); // rwtodo: don't know what these mean https://adafruit.github.io/Adafruit_AS7341/html/class_adafruit___a_s7341.html#a82798183157357664568a6915d281e5f
+    spectrometer.setGain(AS7341_GAIN_256X); // rwtodo: don't know what these mean
+  } else {  
+    Serial.println("COULD NOT FIND SPECTROMETER");
+  }
 }
 
 void spectrometer_print() {
-	/*
-	415nm = 7600ed
-	445nm = 0028ff
-	480nm = 00d5ff
-	515nm = 1fff00
-	555nm = b3ff00
-	590nm = ffdf00
-	630nm = ff4f00
-	680nm = ff0000
-	Near IR/~700nm to ~800 = cc0000
-	*/
-	
-	if (spectrometer.readAllChannels()) {
-		Serial.print("F1,415nm:"); Serial.print(spectrometer.getChannel(AS7341_CHANNEL_415nm_F1));
-		Serial.print(" F2,445nm:"); Serial.print(spectrometer.getChannel(AS7341_CHANNEL_445nm_F2));
-		Serial.print(" F3,480nm:"); Serial.print(spectrometer.getChannel(AS7341_CHANNEL_480nm_F3));
-		Serial.print(" F4,515nm:"); Serial.print(spectrometer.getChannel(AS7341_CHANNEL_515nm_F4));
-		Serial.print(" F5,555nm:"); Serial.print(spectrometer.getChannel(AS7341_CHANNEL_555nm_F5));
-		Serial.print(" F6,590nm:"); Serial.print(spectrometer.getChannel(AS7341_CHANNEL_590nm_F6));
-		Serial.print(" F7,630nm:"); Serial.print(spectrometer.getChannel(AS7341_CHANNEL_630nm_F7));
-		Serial.print(" F8,680nm:"); Serial.print(spectrometer.getChannel(AS7341_CHANNEL_680nm_F8));
-		Serial.print(" White:"); Serial.print(spectrometer.getChannel(AS7341_CHANNEL_CLEAR));
-		Serial.print(" Near IR:"); Serial.print(spectrometer.getChannel(AS7341_CHANNEL_NIR)); // 700nm?
-		
-		float freq = spectrometer.detectFlickerHz();
+  /*
+  415nm = 7600ed
+  445nm = 0028ff
+  480nm = 00d5ff
+  515nm = 1fff00
+  555nm = b3ff00
+  590nm = ffdf00
+  630nm = ff4f00
+  680nm = ff0000
+  Near IR/~700nm to ~800 = cc0000
+  */
+  
+  if (spectrometer.readAllChannels()) {
+    Serial.print("F1,415nm:"); Serial.print(spectrometer.getChannel(AS7341_CHANNEL_415nm_F1));
+    Serial.print(" F2,445nm:"); Serial.print(spectrometer.getChannel(AS7341_CHANNEL_445nm_F2));
+    Serial.print(" F3,480nm:"); Serial.print(spectrometer.getChannel(AS7341_CHANNEL_480nm_F3));
+    Serial.print(" F4,515nm:"); Serial.print(spectrometer.getChannel(AS7341_CHANNEL_515nm_F4));
+    Serial.print(" F5,555nm:"); Serial.print(spectrometer.getChannel(AS7341_CHANNEL_555nm_F5));
+    Serial.print(" F6,590nm:"); Serial.print(spectrometer.getChannel(AS7341_CHANNEL_590nm_F6));
+    Serial.print(" F7,630nm:"); Serial.print(spectrometer.getChannel(AS7341_CHANNEL_630nm_F7));
+    Serial.print(" F8,680nm:"); Serial.print(spectrometer.getChannel(AS7341_CHANNEL_680nm_F8));
+    Serial.print(" White:"); Serial.print(spectrometer.getChannel(AS7341_CHANNEL_CLEAR));
+    Serial.print(" Near IR:"); Serial.print(spectrometer.getChannel(AS7341_CHANNEL_NIR)); // 700nm?
+    
+    float freq = spectrometer.detectFlickerHz();
 
-		Serial.println();
-	} else {
-		Serial.println("spectrometer failed to read all channels");
-	}
+    Serial.println();
+  } else {
+    Serial.println("spectrometer failed to read all channels");
+  }
 }
 
 //////////////////////////////////////////////////////////
 // setup + loop
 //
 void setup() {
-	Serial.begin(9600);
-	
-	text_init();
-	
-	analogWriteResolution(DAC_BIT_DEPTH);
-	DAC_MAX_VALUE = powf(2, DAC_BIT_DEPTH) - 1;
-	analogReadResolution(ADC_BIT_DEPTH);
-	ADC_MAX_VALUE = powf(2, ADC_BIT_DEPTH) - 1;
-	
-	pinMode(UV_PWM_PIN, OUTPUT);
-	pinMode(TORCH_PWM_PIN, OUTPUT);
-	pinMode(LASER_PWM_PIN, OUTPUT);
-	pinMode(ANTENNA_PIN, INPUT); // rwtodo: not completely sure whether commenting this out is better. Test with both antennas.
-	
-	Wire.begin(); // For I2C: thermometer, spectrometer
-	
-	if (thermometer.begin() == false) {
-		Serial.println("thermometer.begin() failed!");
-	} else {
-		thermometer.setUnit(TEMP_C); // Kelvin
-	}
-	
-	// Setup communication with audio-out core
-	Serial1.begin(9600); // rwtodo: maybe bump this up slightly on both chips. Test the maximum.
-	
-	tft_init();
-	
-	// rwtodo: this is temp audio stuff.
-	AudioMemory(30); // notefreq requires less than 30. rwtodo: increase this if FFT doesn't work.
-	note_freq.begin(0.7f); // certainty.
-	
-	spectrometer_init();
+  Serial.begin(9600);
+  
+  text_init();
+  
+  analogWriteResolution(DAC_BIT_DEPTH);
+  DAC_MAX_VALUE = powf(2, DAC_BIT_DEPTH) - 1;
+  analogReadResolution(ADC_BIT_DEPTH);
+  ADC_MAX_VALUE = powf(2, ADC_BIT_DEPTH) - 1;
+  
+  pinMode(UV_PWM_PIN, OUTPUT);
+  pinMode(TORCH_PWM_PIN, OUTPUT);
+  pinMode(LASER_PWM_PIN, OUTPUT);
+  pinMode(ANTENNA_PIN, INPUT); // rwtodo: not completely sure whether commenting this out is better. Test with both antennas.
+  
+  Wire.begin(); // For I2C: thermometer, spectrometer
+  
+  if (thermometer.begin() == false) {
+    Serial.println("thermometer.begin() failed!");
+  } else {
+    thermometer.setUnit(TEMP_C); // Kelvin
+  }
+  
+  // Setup communication with audio-out core
+  Serial1.begin(9600); // rwtodo: maybe bump this up slightly on both chips. Test the maximum.
+  
+  tft_init();
+  
+  // rwtodo: this is temp audio stuff.
+  AudioMemory(30); // notefreq requires less than 30. rwtodo: increase this if FFT doesn't work.
+  note_freq.begin(0.7f); // certainty.
+  
+  spectrometer_init();
 }
 
 float debug_angle = 0;
@@ -512,49 +512,49 @@ bool debug_flip = false;
 int32_t prev_tt = 0;
 
 void loop() {
-	int32_t tt = millis();
-	int32_t dt = tt - prev_tt;
-	
-	// feedback_update(tt, dt);
-	
-	// static int x = 0;
-	
-	// antenna_render(x);
-	
-	// if (++x >= TFT_WIDTH) x = 0;
-	
-	Serial.println();
-	microphone_print();
-	thermometer_print();
-	altimeter_print();
-	// spectrometer_print(); // This hangs the teensy if it fails.
-	
-	Serial.println("Flashing lights");
-	
-	writeNorm(LASER_PWM_PIN, 0.0f);
-	delay(100);
-	writeNorm(LASER_PWM_PIN, 1.0f);
-	writeNorm(UV_PWM_PIN, 0.0f);
-	delay(100);
-	writeNorm(UV_PWM_PIN, 1.0f);
-	writeNorm(TORCH_PWM_PIN, 0.0f);
-	delay(100);
-	writeNorm(TORCH_PWM_PIN, 1.0f);
-	writeNorm(ACCENT_PWM_PIN, 0.0f);
-	delay(100);
-	writeNorm(ACCENT_PWM_PIN, 1.0f);
-	
-	Serial.println("Writing to tft");
-	tft.fillScreen(ST77XX_BLUE);
-	static int y = 10;
-	tft.setCursor(30, y);
-	y += 10;
-	if (y > TFT_HEIGHT) y = 10;
-	tft.print("Timey Wimey");
-	
-	delay(20);
-	
-	prev_tt = tt;
+  int32_t tt = millis();
+  int32_t dt = tt - prev_tt;
+  
+  // feedback_test(tt, dt);
+  // feedback_update(tt, dt);
+  
+  // static int x = 0;
+  
+  // antenna_render(x);
+  
+  // if (++x >= TFT_WIDTH) x = 0;
+  
+  Serial.println();
+  microphone_print();
+  thermometer_print();
+  altimeter_print();
+  // spectrometer_print(); // This hangs the teensy if it fails.
+  
+  Serial.println("Flashing lights");
+  
+  writeNorm(LASER_PWM_PIN, 0.0f);
+  // delay(100);
+  writeNorm(LASER_PWM_PIN, 1.0f);
+  writeNorm(UV_PWM_PIN, 0.0f);
+  // delay(100);
+  writeNorm(UV_PWM_PIN, 1.0f);
+  writeNorm(TORCH_PWM_PIN, 0.0f);
+  // delay(100);
+  writeNorm(TORCH_PWM_PIN, 1.0f);
+  writeNorm(ACCENT_PWM_PIN, 0.0f);
+  // delay(100);
+  writeNorm(ACCENT_PWM_PIN, 1.0f);
+  
+  Serial.println("Writing to tft");
+  tft.fillScreen(ST77XX_BLUE);
+  static int y = 10;
+  tft.setCursor(30, y);
+  y += 10;
+  if (y > TFT_HEIGHT) y = 10;
+  tft.print("Timey Wimey");
+  
+  
+  prev_tt = tt;
 }
 
 
