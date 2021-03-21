@@ -299,6 +299,7 @@ void altimeter_get(float *pascals, float *meters) {
     altimeter.setOutputDataRate(BMP3_ODR_50_HZ); // rwtodo
     
     altimeter_needs_init = false;
+    Serial.println("ALTIMETER REBOOT");
   }
   
   if (altimeter.performReading()) {
@@ -481,10 +482,14 @@ void setup() {
   analogReadResolution(ADC_BIT_DEPTH);
   ADC_MAX_VALUE = powf(2, ADC_BIT_DEPTH) - 1;
   
+  // I2C bus
+  pinMode(SCL_PIN, INPUT);
+  pinMode(SDA_PIN, INPUT);
+  
   pinMode(UV_PWM_PIN, OUTPUT);
   pinMode(TORCH_PWM_PIN, OUTPUT);
   pinMode(LASER_PWM_PIN, OUTPUT);
-  pinMode(ANTENNA_PIN, INPUT); // rwtodo: not completely sure whether commenting this out is better. Test with both antennas.
+  pinMode(ANTENNA_PIN, INPUT); // This should disable pull up/down resistors.
   
   Wire.begin(); // For I2C: thermometer, spectrometer
   
