@@ -2,8 +2,7 @@
 /*
 Next Steps
 ----------
-Try making touch-buttons with the 3M bolts. Remember to ground yourself.
-buy an adafruit micro-lipo usb c module when you know which pressure sensor to get.
+Experiment with the AQH
 */
 
 /* SMD parts
@@ -71,11 +70,11 @@ float lerp(float a, float b, float t) {
   return a + (b-a)*t;
 }
 
-float readNorm(int pin) {
+float read_norm(int pin) {
   return analogRead(pin) / (float)ADC_MAX_VALUE;
 }
 
-void writeNorm(int pin, float input) {
+void write_norm(int pin, float input) {
   // rwtodo: clamp input to 0-1
   analogWrite(pin, input * DAC_MAX_VALUE);
 }
@@ -242,8 +241,8 @@ void feedback_update(int32_t tt, int32_t dt) {
     
     float light_intensity = feedback_intensity * feedback_intensity;
     
-    writeNorm(UV_PWM_PIN, light_intensity);
-    writeNorm(TORCH_PWM_PIN, light_intensity * 0.04f);
+    write_norm(UV_PWM_PIN, light_intensity);
+    write_norm(TORCH_PWM_PIN, light_intensity * 0.04f);
   } else {
     serial_pitch_byte = 0;
     analogWrite(UV_PWM_PIN, 0);
@@ -372,7 +371,7 @@ void antenna_render_graph(int x, int y, int height) {
   
   // signal
   float sample_norm = samples[x] / (float)ADC_MAX_VALUE;
-  // float sample_norm = readNorm(ANTENNA_PIN);
+  // float sample_norm = read_norm(ANTENNA_PIN);
   
   if (x == 0) {
     tft.drawPixel(x, y + sample_norm * height, sample_color);
@@ -422,33 +421,65 @@ void microphone_print() {
 //////////////////////////////////////////////////////////
 // spectrometer
 // I2C address: 0x39
-// rwtodo: remove spectrometer's i2c pullups. 10k is too low for the altimeter.
+// https://adafruit.github.io/Adafruit_AS7341/html/class_adafruit___a_s7341.html#a82798183157357664568a6915d281e5f
 #include <Adafruit_AS7341.h>
 Adafruit_AS7341 spectrometer;
 
+as7341_gain_t spectrometer_min_gain = 0;
+as7341_gain_t spectrometer_max_gain = 10;
+
+// Index into this using a as7341_gain_t.
+char* spectrometer_gain_strings[] {
+  "0.5", "1", "2", "4", "8", "16", "32", "64", "128", "256", "512"
+};
+
 void spectrometer_init() {
+  // Assert the gain constants are in order
+  assert(AS7341_GAIN_0_5X == 0);
+  assert(AS7341_GAIN_1X == 1);
+  assert(AS7341_GAIN_2X == 2);
+  assert(AS7341_GAIN_4X == 3);
+  assert(AS7341_GAIN_8X == 4);
+  assert(AS7341_GAIN_16X == 5);
+  assert(AS7341_GAIN_32X == 6);
+  assert(AS7341_GAIN_64X == 7);
+  assert(AS7341_GAIN_128X == 8);
+  assert(AS7341_GAIN_256X == 9);
+  assert(AS7341_GAIN_512X == 10);
+  
   if (spectrometer.begin()) {
-    spectrometer.setATIME(100); // rwtodo: don't know what these mean
-    spectrometer.setASTEP(999); // rwtodo: don't know what these mean https://adafruit.github.io/Adafruit_AS7341/html/class_adafruit___a_s7341.html#a82798183157357664568a6915d281e5f
+    spectrometer.setATIME(100); // rwtodo: Set the step count for "integration time"
+    spectrometer.setASTEP(999); // rwtodo: Set the step size for "integration time"
     spectrometer.setGain(AS7341_GAIN_256X); // rwtodo: don't know what these mean
   } else {  
     Serial.println("COULD NOT FIND SPECTROMETER");
   }
 }
 
+struct SpectrometerResult {
+  uint16_t nm415; // 7600ed
+  uint16_t nm445; // 0028ff
+  uint16_t nm480; // 00d5ff
+  uint16_t nm515; // 1fff00
+  uint16_t nm555; // b3ff00
+  uint16_t nm590; // ffdf00
+  uint16_t nm630; // ff4f00
+  uint16_t nm680; // ff0000
+  uint16_t white;
+  uint16_t near_ir; // ~700nm to ~800, cc0000
+  uint16_t flicker_hz;
+};
+
+/* DEMO:
+SpectrometerResult result;
+if (spectrometer.readAllChannels(&result)) {
+  // result is populated
+  result.flicker_hz = spectrometer.detectFlickerHz();
+  // rwtodo: do I need to call toBasicCounts() on the results?
+}
+*/
+
 void spectrometer_print() {
-  /*
-  415nm = 7600ed
-  445nm = 0028ff
-  480nm = 00d5ff
-  515nm = 1fff00
-  555nm = b3ff00
-  590nm = ffdf00
-  630nm = ff4f00
-  680nm = ff0000
-  Near IR/~700nm to ~800 = cc0000
-  */
-  
   if (spectrometer.readAllChannels()) {
     Serial.print("F1,415nm:"); Serial.print(spectrometer.getChannel(AS7341_CHANNEL_415nm_F1));
     Serial.print(" F2,445nm:"); Serial.print(spectrometer.getChannel(AS7341_CHANNEL_445nm_F2));
@@ -511,9 +542,6 @@ void setup() {
   spectrometer_init();
 }
 
-float debug_angle = 0;
-bool debug_flip = false;
-
 int32_t prev_tt = 0;
 
 void loop() {
@@ -529,34 +557,36 @@ void loop() {
   
   // if (++x >= TFT_WIDTH) x = 0;
   
-  Serial.println();
+  // Serial.println();
   microphone_print();
   thermometer_print();
-  altimeter_print();
+  // altimeter_print();
   // spectrometer_print(); // This hangs the teensy if it fails.
   
-  Serial.println("Flashing lights");
+  // Serial.println("Flashing lights");
   
-  writeNorm(LASER_PWM_PIN, 0.0f);
-  // delay(100);
-  writeNorm(LASER_PWM_PIN, 1.0f);
-  writeNorm(UV_PWM_PIN, 0.0f);
-  // delay(100);
-  writeNorm(UV_PWM_PIN, 1.0f);
-  writeNorm(TORCH_PWM_PIN, 0.0f);
-  // delay(100);
-  writeNorm(TORCH_PWM_PIN, 1.0f);
-  writeNorm(ACCENT_PWM_PIN, 0.0f);
-  // delay(100);
-  writeNorm(ACCENT_PWM_PIN, 1.0f);
+  write_norm(LASER_PWM_PIN, 0.0f);
+  delay(100);
+  write_norm(LASER_PWM_PIN, 1.0f);
+  write_norm(UV_PWM_PIN, 0.0f);
+  delay(100);
+  write_norm(UV_PWM_PIN, 1.0f);
+  write_norm(TORCH_PWM_PIN, 0.0f);
+  delay(100);
+  write_norm(TORCH_PWM_PIN, 1.0f);
+  write_norm(ACCENT_PWM_PIN, 0.0f);
+  delay(100);
+  write_norm(ACCENT_PWM_PIN, 1.0f);
   
-  Serial.println("Writing to tft");
-  tft.fillScreen(ST77XX_BLUE);
+  // Serial.println("Writing to tft");
+  tft.fillScreen(ST77XX_BLACK);
   static int y = 10;
   tft.setCursor(30, y);
   y += 10;
   if (y > TFT_HEIGHT) y = 10;
   tft.print("Timey Wimey");
+  
+  delay(100);
   
   
   prev_tt = tt;
