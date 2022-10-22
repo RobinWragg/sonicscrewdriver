@@ -270,62 +270,12 @@ void feedback_test(int32_t tt, int32_t dt) {
   feedback_intensity = three_second_loop_norm;
 }
 
-//////////////////////////////////////////////////////////
-// accelerometer
-// I2C address:
-
-//////////////////////////////////////////////////////////
-// humidity sensor
-// I2C address: 0xB8
-
+// rwtodo remove:
 //////////////////////////////////////////////////////////
 // altimeter
 // I2C address: 0x77
 #include <Adafruit_Sensor.h>
 #include "Adafruit_BMP3XX.h"
-Adafruit_BMP3XX altimeter;
-#define SEALEVELPRESSURE_HPA (1013.25)
-
-bool altimeter_needs_init = true;
-
-// rwtodo: confirm that initialising the sensor before every read does not affect the accuracy of the readings.
-void altimeter_get(float *pascals, float *meters) {
-  if (altimeter_needs_init && altimeter.begin_I2C()) {
-    // Set up oversampling and filter initialization
-    altimeter.setTemperatureOversampling(BMP3_OVERSAMPLING_8X); // BMP3_NO_OVERSAMPLING to BMP3_OVERSAMPLING_32X rwtodo
-    altimeter.setPressureOversampling(BMP3_OVERSAMPLING_4X); // BMP3_NO_OVERSAMPLING to BMP3_OVERSAMPLING_32X rwtodo
-    altimeter.setIIRFilterCoeff(BMP3_IIR_FILTER_COEFF_3); // ? rwtodo
-    altimeter.setOutputDataRate(BMP3_ODR_50_HZ); // rwtodo
-    
-    altimeter_needs_init = false;
-    Serial.println("ALTIMETER REBOOT");
-  }
-  
-  if (altimeter.performReading()) {
-    *pascals = altimeter.pressure;
-    *meters = altimeter.readAltitude(SEALEVELPRESSURE_HPA);
-    return;
-  }
-  
-  // If something went wrong, return 0 (so I'm aware of the failure) and init the next time.
-  altimeter_needs_init = true;
-  *pascals = 0;
-  *meters = 0;
-}
-
-void altimeter_print() {
-  float pascals, meters;
-  altimeter_get(&pascals, &meters);
-  Serial.print("Pascals: "); Serial.print(pascals);
-  Serial.print(" Meters: "); Serial.println(meters);
-}
-
-//////////////////////////////////////////////////////////
-// magnetometer
-// I2C address: 0x1E
-//
-// gyroscope+accelerometer
-// I2C address: 0x6B
 
 //////////////////////////////////////////////////////////
 // thermometer
@@ -560,7 +510,6 @@ void loop() {
   // Serial.println();
   microphone_print();
   thermometer_print();
-  // altimeter_print();
   // spectrometer_print(); // This hangs the teensy if it fails.
   
   // Serial.println("Flashing lights");
